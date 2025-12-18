@@ -1,6 +1,6 @@
 import { getToken } from "@/lib/auth";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://supershoply2.onrender.com/";
 
 export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const url = path.startsWith("http") ? path : `${BASE_URL}${path}`;
@@ -19,4 +19,5 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
     throw new Error(message);
   }
   return res.json() as Promise<T>;
+
 }
