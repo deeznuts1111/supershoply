@@ -50,7 +50,7 @@ export default function CheckoutPage() {
   const [pm, setPM] = useState<PM>("cod");
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<unknown>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent) {
@@ -90,7 +90,7 @@ export default function CheckoutPage() {
       setResult(response.order);
 
       // Tuỳ chọn: router.replace(`/order/${response.order.id}`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.message || "Có lỗi xảy ra khi đặt hàng.");
     } finally {
       setSubmitting(false);
@@ -241,3 +241,4 @@ export default function CheckoutPage() {
     </section>
   );
 }
+
