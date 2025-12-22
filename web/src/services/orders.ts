@@ -10,8 +10,9 @@ export type CreateOrderInput = {
 };
 
 export function createOrder(input: CreateOrderInput) {
-  return apiFetch<{ ok: boolean; order: any }>("/api/v1/orders", {
+  return apiFetch<{ ok: boolean; order: unknown }>("/api/v1/orders", {
     method: "POST",
     body: JSON.stringify(input),
   });
+
 }
