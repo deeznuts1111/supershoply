@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, Suspense } from "react"; // Thêm Suspense
 import { useSearchParams, useRouter } from "next/navigation";
 import { PRODUCTS } from "@/mock/products";
 import { calcTotals } from "@/lib/checkout";
@@ -9,16 +9,15 @@ import { createOrder } from "@/services/orders";
 
 type PM = "cod" | "banking" | "momo";
 
-// Fallback format nếu bạn chưa có helper formatVND
 function formatVND(n: number) {
   return n.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
 }
 
-export default function CheckoutPage() {
+// 1. Tách toàn bộ logic cũ vào component này
+function CheckoutContent() {
   const sp = useSearchParams();
   const router = useRouter();
 
-  // Đọc items từ URL: ?items=slug1:2,slug2:1
   const itemsParam = sp.get("items") || "";
   const parsed = useMemo(() => {
     const list = itemsParam
@@ -29,7 +28,7 @@ export default function CheckoutPage() {
         const [slug, qty] = pair.split(":");
         return { slug, quantity: Math.max(parseInt(qty || "1", 10), 1) };
       });
-    // map sang sản phẩm mock
+    
     const enriched = list
       .map((it) => {
         const p = PRODUCTS.find((x) => x.slug === it.slug);
@@ -43,14 +42,13 @@ export default function CheckoutPage() {
     return calcTotals(parsed.map((x) => ({ price: x.product.price, quantity: x.quantity })), "");
   }, [parsed]);
 
-  // Form state
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [addr, setAddr] = useState("");
   const [pm, setPM] = useState<PM>("cod");
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [result, setResult] = useState<unknown>(null);
+  const [result, setResult] = useState<any>(null); // Để tạm any hoặc định nghĩa interface Order
   const [error, setError] = useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent) {
@@ -88,9 +86,7 @@ export default function CheckoutPage() {
       const response = await createOrder(payload);
       if (!response?.order) throw new Error("Tạo đơn hàng thất bại");
       setResult(response.order);
-
-      // Tuỳ chọn: router.replace(`/order/${response.order.id}`);
-    } catch (err: unknown) {
+    } catch (err: any) {
       setError(err.message || "Có lỗi xảy ra khi đặt hàng.");
     } finally {
       setSubmitting(false);
@@ -102,7 +98,6 @@ export default function CheckoutPage() {
       <div className="md:col-span-2">
         <h1 className="text-2xl font-semibold mb-4">Thanh toán</h1>
 
-        {/* Tóm tắt giỏ hàng */}
         <div className="mb-6 border rounded-xl p-4">
           <h2 className="font-medium mb-3">Tóm tắt giỏ hàng</h2>
           {parsed.length === 0 ? (
@@ -132,10 +127,8 @@ export default function CheckoutPage() {
               ))}
             </ul>
           )}
-          <div className="mt-3 text-right text-sm text-gray-500">{parsed.length} dòng</div>
         </div>
 
-        {/* Form thông tin */}
         <form onSubmit={onSubmit} className="space-y-3">
           <div>
             <label className="block text-sm mb-1">Họ tên *</label>
@@ -168,18 +161,12 @@ export default function CheckoutPage() {
           <div>
             <label className="block text-sm mb-1">Phương thức thanh toán</label>
             <div className="flex gap-3">
-              <label className="flex items-center gap-2">
-                <input type="radio" name="pm" value="cod" checked={pm === "cod"} onChange={() => setPM("cod")} />
-                <span>COD</span>
-              </label>
-              <label className="flex items-center gap-2">
-                <input type="radio" name="pm" value="banking" checked={pm === "banking"} onChange={() => setPM("banking")} />
-                <span>Banking</span>
-              </label>
-              <label className="flex items-center gap-2">
-                <input type="radio" name="pm" value="momo" checked={pm === "momo"} onChange={() => setPM("momo")} />
-                <span>MoMo</span>
-              </label>
+              {(["cod", "banking", "momo"] as PM[]).map((type) => (
+                <label key={type} className="flex items-center gap-2 uppercase">
+                  <input type="radio" name="pm" value={type} checked={pm === type} onChange={() => setPM(type)} />
+                  <span>{type}</span>
+                </label>
+              ))}
             </div>
           </div>
 
@@ -204,20 +191,16 @@ export default function CheckoutPage() {
           </div>
         </form>
 
-        {/* Kết quả */}
         {result && (
           <div className="mt-6 border rounded-xl p-4 bg-green-50">
             <h2 className="font-medium mb-2">Đặt hàng thành công</h2>
-            <p className="text-sm">
-              Mã đơn: <b>{result.id}</b>
-            </p>
+            <p className="text-sm">Mã đơn: <b>{result.id}</b></p>
             <p className="text-sm">Trạng thái: {result.status}</p>
           </div>
         )}
       </div>
 
-         {/* Tóm tắt thanh toán */}
-         <aside className="border rounded-xl p-4 h-fit">
+      <aside className="border rounded-xl p-4 h-fit">
         <h2 className="font-medium mb-3">Thanh toán</h2>
         <div className="space-y-1 text-sm">
           <div className="flex justify-between">
@@ -234,11 +217,16 @@ export default function CheckoutPage() {
           <span>Tổng cộng</span>
           <span>{formatVND(totals.total)}</span>
         </div>
-        <p className="text-xs text-gray-500 mt-3">
-          * Phí ship thay đổi theo địa chỉ & khuyến mãi (giả lập).
-        </p>
       </aside>
     </section>
   );
 }
 
+// 2. Export default bọc trong Suspense
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center">Đang tải trang thanh toán...</div>}>
+      <CheckoutContent />
+    </Suspense>
+  );
+}
