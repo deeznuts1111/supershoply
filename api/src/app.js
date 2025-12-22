@@ -15,7 +15,7 @@ app.use(
 );
 
 // CORS theo ENV
-const allowOrigin = process.env.CORS_ORIGIN || "https://supershoply-1.onrender.com";
+const allowOrigin = process.env.CORS_ORIGIN || "https://supershoply-2.onrender.com";
 app.use(
   cors({
     origin: allowOrigin,
@@ -87,3 +87,4 @@ app.use((err, req, res, next) => {
 
 
 module.exports = app;
+
