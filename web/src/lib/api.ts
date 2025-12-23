@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "mongodb+srv://phucdz:phuc9807@shoply.kzzca8e.mongodb.net/";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "mongodb+srv://phucdz:phuc9807@shoply.kzzca8e.mongodb.net";
 
 export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const url = path.startsWith("http") ? path : `${BASE_URL}${path}`;
@@ -13,6 +13,7 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
   return res.json() as Promise<T>;
 
 }
+
 
 
 
