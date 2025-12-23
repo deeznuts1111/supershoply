@@ -1,22 +1,60 @@
-import type { Product } from "@/types/product";
+import { Product } from "@/types/product";
+import clientPromise from "../../../api/src/db/mongoose"; // Đường dẫn tương đối từ web/src/mock đến api/src/db
 
-const COLORS = ["Đen", "Trắng", "Xanh", "Be", "Nâu"];
-const SIZES = ["S", "M", "L", "XL"];
-const BRANDS = ["Phúc", "Phùc", "Phục", "Phủc"];
-export const PRODUCTS: Product[] = Array.from({ length: 30 }, (_, i) => {
-  const n = i + 1;
-  return {
-    _id: `p${n}`,
-    title: `Sản phẩm ${n}`,
-    slug: `san-pham-${n}`,
-    price: 99000 + n * 10000,
-    images: [`/IMAGES/${ i + 1 <=4 ? i + 1:"ham"}.png`],    
-    stock: n % 7 === 0 ? 0 : ((n * 3) % 21) + 1,
-    rating: (n % 5) + 1,
-    brand: BRANDS[n % BRANDS.length],
-    variants: [{ color: COLORS[n % COLORS.length], size: SIZES[n % SIZES.length] }],
-    description: "Mô tả",
-    category: n % 2 ? "fashion" : "accessories",
-  } satisfies Product;
-});
+export async function getProducts(limit: number = 50): Promise<Product[]> {
+  try {
+    const client = await clientPromise;
+    const db = client.db(process.env.MONGODB_DB || "supershoply");
+    
+    const products = await db
+      .collection("products")
+      .find({})
+      .limit(limit)
+      .toArray();
+    
+    return products.map(product => ({
+      _id: product._id.toString(),
+      title: product.title,
+      slug: product.slug,
+      price: product.price,
+      images: product.images,
+      stock: product.stock,
+      rating: product.rating,
+      brand: product.brand,
+      variants: product.variants,
+      description: product.description,
+      category: product.category,
+    })) as Product[];
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return [];
+  }
+}
 
+export async function getProductById(id: string): Promise<Product | null> {
+  try {
+    const client = await clientPromise;
+    const db = client.db(process.env.MONGODB_DB || "supershoply");
+    
+    const product = await db.collection("products").findOne({ _id: id });
+    
+    if (!product) return null;
+    
+    return {
+      _id: product._id.toString(),
+      title: product.title,
+      slug: product.slug,
+      price: product.price,
+      images: product.images,
+      stock: product.stock,
+      rating: product.rating,
+      brand: product.brand,
+      variants: product.variants,
+      description: product.description,
+      category: product.category,
+    } as Product;
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    return null;
+  }
+}
