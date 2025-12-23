@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
-const uri = process.env.MONGODB_URI || "mongodb+srv://phucdz:phuc9807@shoply.kzzca8e.mongodb.net/?appName=Shoply";
-const dbName = process.env.MONGODB_DB || "shoply";
+const uri = process.env.MONGODB_URI || "mongodb+srv://phucdz:phuc9807@shooly.e65ipe6.mongodb.net/?appName=shooly";
+const dbName = process.env.MONGODB_DB || "supershoply";
 
 let isConnected = false;
 
@@ -25,3 +25,4 @@ function bindMongoLogs() {
 
 
 module.exports = { connectMongo, bindMongoLogs };
+
