@@ -14,32 +14,11 @@ app.use(
   })
 );
 
-// CORS - HỖ TRỢ NHIỀU ORIGIN
-const allowedOrigins = [
-  "https://supershoply-2.onrender.com",
-  "http://localhost:3000",
-  "http://localhost:5173", // nếu dùng Vite
-];
-
-// Nếu có CORS_ORIGIN trong env thì thêm vào
-if (process.env.CORS_ORIGIN) {
-  const envOrigins = process.env.CORS_ORIGIN.split(',').map(o => o.trim());
-  allowedOrigins.push(...envOrigins);
-}
-
+// CORS theo ENV
+const allowOrigin = process.env.CORS_ORIGIN || "https://supershoply-2.onrender.com";
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // Cho phép requests không có origin (Postman, mobile apps, curl)
-      if (!origin) return callback(null, true);
-      
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.warn(`⚠️ CORS blocked origin: ${origin}`);
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
+    origin: allowOrigin,
     credentials: true,
   })
 );
@@ -100,13 +79,9 @@ app.use((err, req, res, next) => {
   const status = err.status || 500;
   const code = err.code || (status === 500 ? "INTERNAL_ERROR" : "UNKNOWN_ERROR");
   const message = err.message || "Internal Server Error";
-  
-  // Log error trong mọi môi trường để debug
-  console.error("[ERROR]", status, code, message);
   if (process.env.NODE_ENV !== "production") {
-    console.error(err.stack);
+    console.error("[ERROR]", status, code, message, err.stack);
   }
-  
   res.status(status).json({ ok: false, error: { code, message } });
 });
 
