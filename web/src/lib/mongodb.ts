@@ -1,43 +1,29 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://phucdz:phuc9807@shooly.e65ipe6.mongodb.net/?appName=shooly";
-const MONGODB_DB = process.env.MONGODB_DB || "supershoply";
+const mongoose = require("mongoose");
 
-interface MongooseCache {
-  conn: typeof mongoose | null;
-  promise: Promise<typeof mongoose> | null;
+const uri = process.env.MONGODB_URI || "mongodb+srv://phucdz:phuc9807@shooly.e65ipe6.mongodb.net/?appName=shooly";
+const dbName = process.env.MONGODB_DB || "supershoply";
+
+let isConnected = false;
+
+async function connectMongo() {
+  if (isConnected) return mongoose.connection;
+  const conn = await mongoose.connect(uri, {
+    dbName,
+    maxPoolSize: 10,
+    serverSelectionTimeoutMS: 5000,
+  });
+  isConnected = true;
+  return conn.connection;
 }
 
-declare global {
-  var mongoose: MongooseCache;
+function bindMongoLogs() {
+  const conn = mongoose.connection;
+  conn.on("connected", () => console.log(`✔ Mongo connected: ${uri}/${dbName}`));
+  conn.on("error", (err) => console.error("✖ Mongo error:", err.message));
+  conn.on("disconnected", () => console.warn("⚠ Mongo disconnected"));
 }
 
-let cached: MongooseCache = global.mongoose || { conn: null, promise: null };
 
-if (!global.mongoose) {
-  global.mongoose = cached;
-}
-
-export async function connectDB() {
-  if (cached.conn) {
-    return cached.conn;
-  }
-
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-      dbName: MONGODB_DB,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI, opts);
-  }
-
-  try {
-    cached.conn = await cached.promise;
-  } catch (e) {
-    cached.promise = null;
-    throw e;
-  }
-
-  return cached.conn;
-}
+module.exports = { connectMongo, bindMongoLogs };
