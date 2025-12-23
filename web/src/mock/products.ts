@@ -62,7 +62,7 @@ export const PRODUCTS: Product[] = Array.from({ length: 50 }, (_, i) => {
     _id: `p${n}`,
     title: ELECTRONIC_NAMES[i],
     slug: `san-pham-${n}`,
-    price: 500_000 + n * 150_000,
+    price: 99000 + n * 10000,
     images: [
       `/IMAGES/${n <= 4 ? n : "ham"}.png`
     ],
@@ -74,3 +74,4 @@ export const PRODUCTS: Product[] = Array.from({ length: 50 }, (_, i) => {
     category: "electronics",
   } satisfies Product;
 });
+
