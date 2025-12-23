@@ -1,29 +1,41 @@
-import { Product } from "@/types/product";
-import clientPromise from "../../../api/src/db/mongoose"; // Đường dẫn tương đối từ web/src/mock đến api/src/db
+import type { Product } from "@/types/product";
+import { connectDB } from "@/lib/mongodb";
+import mongoose from "mongoose";
+
+// Schema cho Product (nếu chưa có)
+const ProductSchema = new mongoose.Schema({
+  title: String,
+  slug: String,
+  price: Number,
+  images: [String],
+  stock: Number,
+  rating: Number,
+  brand: String,
+  variants: Array,
+  description: String,
+  category: String,
+}, { collection: 'products' });
+
+const ProductModel = mongoose.models.Product || mongoose.model('Product', ProductSchema);
 
 export async function getProducts(limit: number = 50): Promise<Product[]> {
   try {
-    const client = await clientPromise;
-    const db = client.db(process.env.MONGODB_DB || "supershoply");
+    await connectDB();
     
-    const products = await db
-      .collection("products")
-      .find({})
-      .limit(limit)
-      .toArray();
+    const products = await ProductModel.find({}).limit(limit).lean();
     
-    return products.map(product => ({
-      _id: product._id.toString(),
-      title: product.title,
-      slug: product.slug,
-      price: product.price,
-      images: product.images,
-      stock: product.stock,
-      rating: product.rating,
-      brand: product.brand,
-      variants: product.variants,
-      description: product.description,
-      category: product.category,
+    return products.map((p: any) => ({
+      _id: p._id.toString(),
+      title: p.title,
+      slug: p.slug,
+      price: p.price,
+      images: p.images,
+      stock: p.stock,
+      rating: p.rating,
+      brand: p.brand,
+      variants: p.variants,
+      description: p.description,
+      category: p.category,
     })) as Product[];
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -31,12 +43,10 @@ export async function getProducts(limit: number = 50): Promise<Product[]> {
   }
 }
 
-export async function getProductById(id: string): Promise<Product | null> {
+export async function getProductBySlug(slug: string): Promise<Product | null> {
   try {
-    const client = await clientPromise;
-    const db = client.db(process.env.MONGODB_DB || "supershoply");
-    
-    const product = await db.collection("products").findOne({ _id: id });
+    await connectDB();
+    const product = await ProductModel.findOne({ slug }).lean();
     
     if (!product) return null;
     
@@ -58,3 +68,6 @@ export async function getProductById(id: string): Promise<Product | null> {
     return null;
   }
 }
+
+// Export mock data để không phá code cũ
+export const PRODUCTS: Product[] = [];
