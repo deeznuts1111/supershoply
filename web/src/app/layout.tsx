@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Be_Vietnam_Pro } from "next/font/google";
 import SiteHeader from "@/components/SiteHeader";
 import Providers from "./providers";
+import { Suspense } from "react"; // Thêm Suspense
 
 /* ================= FONT ================= */
 const beVietnam = Be_Vietnam_Pro({
@@ -58,32 +59,23 @@ export default function RootLayout({
       >
         {/* ===== BACKGROUND EFFECTS ===== */}
         <div className="pointer-events-none fixed inset-0 z-[-1]">
-          {/* Animated Grid */}
           <div className="absolute inset-0 bg-[linear-gradient(rgba(0,247,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,247,255,0.03)_1px,transparent_1px)] bg-[size:60px_60px] [animation:grid_20s_linear_infinite]" />
-          
-          {/* Diagonal Scanlines */}
           <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,247,255,0.03)_2px,rgba(0,247,255,0.03)_4px)]" />
-          
-          {/* Multiple Neon Glows */}
           <div className="absolute top-[-20%] left-[10%] w-[600px] h-[600px] rounded-full bg-cyan-500/20 blur-[150px] animate-pulse" />
           <div className="absolute bottom-[-20%] right-[10%] w-[500px] h-[500px] rounded-full bg-blue-600/15 blur-[120px] animate-pulse [animation-delay:1s]" />
           <div className="absolute top-[40%] left-[60%] w-[400px] h-[400px] rounded-full bg-purple-600/10 blur-[100px] animate-pulse [animation-delay:2s]" />
-          
-          {/* Holographic Corner Effects */}
           <div className="absolute top-0 left-0 w-[300px] h-[300px] bg-gradient-to-br from-cyan-500/10 to-transparent" />
           <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-gradient-to-tl from-blue-500/10 to-transparent" />
-          
-          {/* Moving Light Beams */}
           <div className="absolute top-0 left-1/4 w-[2px] h-full bg-gradient-to-b from-transparent via-cyan-400/50 to-transparent [animation:beam_8s_ease-in-out_infinite]" />
           <div className="absolute top-0 right-1/3 w-[2px] h-full bg-gradient-to-b from-transparent via-blue-400/50 to-transparent [animation:beam_6s_ease-in-out_infinite] [animation-delay:2s]" />
-          
-          {/* Glitch Effect Overlay */}
           <div className="absolute inset-0 opacity-[0.02] bg-[url('/noise.png')] mix-blend-overlay" />
         </div>
 
         <Providers>
-          <SiteHeader/>
-          {/* Bỏ main wrapper để tránh conflict với shop layout */}
+          {/* Bao bọc Header bằng Suspense để tránh lỗi useSearchParams khi build */}
+          <Suspense fallback={<div className="h-20" />}>
+            <SiteHeader/>
+          </Suspense>
           {children}
         </Providers>
       </body>
