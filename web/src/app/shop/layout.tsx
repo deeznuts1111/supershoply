@@ -1,17 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { headers } from "next/headers";
 import { Terminal, ChevronRight } from "lucide-react";
 
 export const metadata: Metadata = { 
-  title: "Shop — Phúc Sigma",
+  title: "Shop — Phúc Electronics",
   description: "Khám phá kho công nghệ tiên tiến với hàng ngàn sản phẩm chất lượng cao"
 };
 
-export default async function ShopLayout({ children }: { children: React.ReactNode }) {
-  const pathname = (await headers()).get("x-pathname") || "/shop";
-  const isDetail = pathname.startsWith("/shop/") && pathname.split("/").length > 2;
-
+export default function ShopLayout({ children }: { children: React.ReactNode }) {
   return (
     <section className="relative">
       {/* Breadcrumb - Futuristic Style */}
@@ -37,18 +33,11 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
             <ChevronRight size={12} className="text-gray-600" />
             
             <Link 
-              className={`${isDetail ? 'text-gray-400 hover:text-cyan-400' : 'text-cyan-400'} transition-colors uppercase`}
+              className="text-cyan-400 transition-colors uppercase"
               href="/shop"
             >
               Shop
             </Link>
-            
-            {isDetail && (
-              <>
-                <ChevronRight size={12} className="text-gray-600" />
-                <span className="text-white uppercase">Product Detail</span>
-              </>
-            )}
           </nav>
         </div>
       </div>
