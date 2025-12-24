@@ -1,241 +1,233 @@
 "use client";
-
-import Link from "next/link";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import ProductCard from "@/components/ProductCard";
+import SiteFooter from "@/components/SiteFooter"; 
+import { useProductsQuery } from "@/hooks/useProductsQuery";
+import { Search, ChevronLeft, ChevronRight, Terminal, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
-import {
-  ShoppingBag,
-  ShoppingCart,
-  LayoutDashboard,
-  Zap,
-  Cpu,
-  ShieldCheck,
-  Terminal,
-  Binary,
-  Sparkles,
-} from "lucide-react";
-import SiteFooter from "@/components/SiteFooter";
 
-export default function HomePage() {
+const LIMIT = 12;
+
+export default function ShopPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const pageParam = Math.max(parseInt(searchParams.get("page") || "1", 10), 1);
+  const qParam = searchParams.get("q") || "";
+
+  const [qInput, setQInput] = useState(qParam);
+  useEffect(() => setQInput(qParam), [qParam]);
+
+  const queryArgs = useMemo(() => ({ page: pageParam, limit: LIMIT, q: qParam || undefined }), [pageParam, qParam]);
+  const { data, isLoading } = useProductsQuery(queryArgs);
+
+  function setUrl(next: { page?: number; q?: string | null }) {
+    const sp = new URLSearchParams(searchParams.toString());
+    if (typeof next.page === "number") sp.set("page", String(next.page));
+    if (next.q !== undefined) {
+      if (next.q && next.q.trim()) {
+        sp.set("q", next.q.trim());
+        sp.set("page", "1");
+      } else {
+        sp.delete("q");
+        sp.set("page", "1");
+      }
+    }
+    router.push(`${pathname}?${sp.toString()}`, { scroll: true });
+  }
+
   return (
-    <>
-      <main className="relative overflow-hidden">
-        {/* ================= HERO - HIGH CONTRAST ================= */}
-        <section className="relative py-32 min-h-[85vh] flex items-center">
-          <div className="absolute inset-0 -z-10">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px]">
-              <div className="absolute inset-0 bg-[radial-gradient(circle,rgba(0,247,255,0.2)_0%,transparent_70%)] animate-pulse" />
-              <div className="absolute inset-0 border border-cyan-500/20 rounded-full animate-[spin_20s_linear_infinite]" />
+    <main className="relative min-h-screen">
+      {/* Background Effects - Giữ lại hiệu ứng ánh sáng mờ để tạo chiều sâu trên nền cũ */}
+      <div className="fixed inset-0 -z-10 pointer-events-none">
+        <div className="absolute top-20 left-[10%] w-[500px] h-[500px] rounded-full bg-cyan-500/10 blur-[120px] animate-pulse" />
+        <div className="absolute bottom-20 right-[10%] w-[400px] h-[400px] rounded-full bg-blue-600/10 blur-[100px] animate-pulse [animation-delay:1s]" />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* ================= HEADER SECTION ================= */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-12"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0a0e27]/80 backdrop-blur-sm border border-cyan-400/40">
+              <Terminal size={14} className="text-cyan-400" />
+              <span className="text-xs font-bold text-cyan-400 tracking-wider uppercase">PRODUCT DATABASE</span>
             </div>
+            <div className="h-[2px] flex-1 bg-gradient-to-r from-cyan-400/40 to-transparent" />
           </div>
 
-          <div className="container mx-auto max-w-7xl px-4 text-center relative z-10">
-            {/* Glitch Badge */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0a0e27] border border-cyan-400 mb-8 shadow-[0_0_15px_rgba(0,247,255,0.3)]"
-            >
-              <Terminal size={16} className="text-cyan-400" />
-              <span className="text-sm font-bold text-white tracking-wider">
-                SYSTEM ONLINE // V4.2.1
-              </span>
-            </motion.div>
-
-            {/* Main Title - Dark for contrast against glowing bg */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              <h1 className="text-6xl sm:text-7xl md:text-8xl font-black tracking-tighter leading-none">
-                <span className="relative inline-block text-[#061e33] drop-shadow-[0_0_2px_rgba(0,247,255,0.5)]">
-                  PHÚC ELECTRONIC
-                </span>
-              </h1>
-              
-              <div className="mt-6 flex items-center justify-center gap-2">
-                <Binary size={20} className="text-blue-900" />
-                <h2 className="text-xl sm:text-2xl font-bold text-[#0a2540] tracking-[0.3em]">
-                  FUTURE • TECH • TODAY
-                </h2>
-                <Binary size={20} className="text-blue-900" />
-              </div>
-            </motion.div>
-
-            {/* Description - Dark text */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="mt-10 text-lg sm:text-xl text-[#0f172a] max-w-3xl mx-auto leading-relaxed font-semibold"
-            >
-              Khám phá thế giới công nghệ tương lai. Nền tảng thương mại điện tử 
-              <span className="text-blue-700 font-black"> thế hệ mới</span>, nơi hiện thực 
-              gặp gỡ không gian ảo.
-            </motion.p>
-
-            {/* Buttons - High visibility */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="mt-14 flex flex-wrap justify-center gap-4"
-            >
-              <Link href="/shop">
-                <button className="group relative px-10 py-5 bg-[#0a0e27] text-cyan-400 font-black text-lg transition-all hover:shadow-[0_0_20px_rgba(0,247,255,0.6)]">
-                  <span className="relative flex items-center gap-2">
-                    <ShoppingBag size={20} /> VÀO SHOP
-                  </span>
-                </button>
-              </Link>
-
-              <Link href="/cart">
-                <button className="group relative px-10 py-5 border-2 border-[#0a2540] text-[#0a2540] font-black text-lg transition-all hover:bg-[#0a2540] hover:text-white">
-                  <span className="relative flex items-center gap-2">
-                    <ShoppingCart size={20} /> CART
-                  </span>
-                </button>
-              </Link>
-
-              <Link href="/admin">
-                <button className="group relative px-10 py-5 border-2 border-purple-900 text-purple-900 font-black text-lg transition-all hover:bg-purple-900 hover:text-white">
-                  <span className="relative flex items-center gap-2">
-                    <LayoutDashboard size={20} /> ADMIN
-                  </span>
-                </button>
-              </Link>
-            </motion.div>
-
-            {/* Stats - Dark text */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-              className="mt-20 flex flex-wrap justify-center gap-12"
-            >
-              {[
-                { label: "PRODUCTS", value: "500+" },
-                { label: "USERS", value: "10K+" },
-                { label: "ORDERS", value: "25K+" },
-              ].map((stat, i) => (
-                <div key={i} className="text-center">
-                  <div className="text-4xl font-black text-[#0a2540]">{stat.value}</div>
-                  <div className="text-xs text-blue-800 font-bold tracking-[0.2em] mt-2">{stat.label}</div>
-                </div>
-              ))}
-            </motion.div>
-          </div>
-        </section>
-
-        {/* ================= FEATURE CARDS ================= */}
-        <section className="container mx-auto max-w-7xl px-4 pb-32">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            {/* Title updated to dark color as requested */}
-            <h2 className="text-4xl font-black text-[#0a2540]">
-              FUTURISTIC SYSTEM
-            </h2>
-            <div className="mt-4 h-1 w-32 mx-auto bg-gradient-to-r from-transparent via-cyan-400 to-transparent" />
-          </motion.div>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {values.map((v, i) => (
-              <motion.div
-                key={v.title}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.15 }}
-                whileHover={{ y: -8, scale: 1.02 }}
-                className="group relative rounded-none border-2 border-cyan-400/40 bg-gradient-to-br from-[#0a0e27] to-[#0f172a] p-8 overflow-hidden transition-all duration-300 hover:border-cyan-400 hover:shadow-[0_0_40px_rgba(0,247,255,0.3)]"
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+            <div>
+              <h1 
+                className="text-5xl font-black tracking-tighter text-white mb-3 uppercase"
+                style={{ textShadow: "2px 2px 0px #0066FF, -2px -2px 0px #0066FF, 2px -2px 0px #0066FF, -2px 2px 0px #0066FF" }}
               >
-                {/* Visual Decorations */}
-                <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-cyan-400 opacity-50 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-cyan-400 opacity-50 group-hover:opacity-100 transition-opacity" />
-                
-                <div className="relative z-10">
-                  <div className="w-14 h-14 rounded-none bg-gradient-to-br from-cyan-500/20 to-blue-500/20 text-cyan-300 flex items-center justify-center mb-6 border border-cyan-400/40 group-hover:border-cyan-400 transition-all group-hover:shadow-[0_0_20px_rgba(0,247,255,0.4)]">
-                    <v.icon size={26} />
-                  </div>
-
-                  <h3 className="text-2xl font-black text-white mb-3 tracking-tight">
-                    {v.title}
-                  </h3>
-
-                  <p className="text-gray-300 leading-relaxed">
-                    {v.desc}
-                  </p>
-
-                  <div className="mt-6 h-[2px] bg-gradient-to-r from-cyan-400/50 to-transparent" />
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-
-        {/* ================= CALL TO ACTION ================= */}
-        <section className="container mx-auto max-w-7xl px-4 pb-32">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="relative rounded-none border-2 border-cyan-400 bg-gradient-to-br from-[#0a0e27] via-[#0f172a] to-[#1e293b] p-12 overflow-hidden"
-          >
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-4">
-                  <Sparkles className="text-cyan-300" size={28} />
-                  <h2 className="text-4xl font-black text-white">
-                    SYSTEM OPERATING
-                  </h2>
-                </div>
-                <p className="text-gray-300 text-lg max-w-2xl leading-relaxed">
-                  Truy cập vào mạng lưới thương mại điện tử tiên tiến nhất. 
-                  Kết nối ngay để khám phá công nghệ tương lai.
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-4">
-                <Link href="/shop">
-                  <button className="group relative px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-black font-black hover:shadow-[0_0_30px_rgba(0,247,255,0.6)] transition-all">
-                    PRODUCTS
-                  </button>
-                </Link>
-
-                <Link href="/cart">
-                  <button className="px-8 py-4 border-2 border-cyan-400 text-white font-black hover:bg-cyan-500/20 transition-all">
-                    CART
-                  </button>
-                </Link>
-              </div>
+                PRODUCT CATALOG
+              </h1>
+              <p className="text-lg font-bold max-w-2xl text-blue-500">
+                Khám phá kho công nghệ tiên tiến • Sản phẩm chất lượng cao • Giao hàng siêu tốc
+              </p>
             </div>
-          </motion.div>
-        </section>
-      </main>
+
+            <div className="flex gap-10">
+              {data && (
+                <>
+                  <div className="text-center">
+                    <div className="text-3xl font-black text-white uppercase" style={{ textShadow: "2px 2px 0px #0066FF" }}>
+                      {data.total}+
+                    </div>
+                    <div className="text-xs font-black tracking-[0.2em] mt-1 text-blue-500 uppercase">PRODUCTS</div>
+                  </div>
+                  <div className="w-[2px] bg-gradient-to-b from-transparent via-cyan-400/30 to-transparent" />
+                  <div className="text-center">
+                    <div className="text-3xl font-black text-white uppercase" style={{ textShadow: "2px 2px 0px #0066FF" }}>
+                      TRANG {data.page}
+                    </div>
+                    <div className="text-xs font-black tracking-[0.2em] mt-1 text-blue-500 uppercase">CURRENT PAGE</div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ================= SEARCH BAR ================= */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-12"
+        >
+          <form
+            className="relative group max-w-2xl"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setUrl({ q: qInput });
+            }}
+          >
+            <div className="relative flex items-center bg-white/5 backdrop-blur-xl border-2 border-cyan-500/40 group-hover:border-cyan-400/80 transition-all duration-300">
+              <Search className="absolute left-4 w-5 h-5 text-cyan-300" />
+              <input
+                value={qInput}
+                onChange={(e) => setQInput(e.target.value)}
+                placeholder="SEARCH PRODUCTS // NHẬP TỪ KHÓA..."
+                className="w-full h-14 pl-12 pr-32 bg-transparent text-black placeholder:text-gray-500 placeholder:font-bold outline-none font-bold tracking-wide"
+              />
+              <button
+                type="submit"
+                className="absolute right-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-black px-6 py-2.5 font-black text-sm tracking-wider hover:shadow-[0_0_20px_rgba(0,247,255,0.6)]"
+              >
+                SEARCH
+              </button>
+            </div>
+          </form>
+        </motion.div>
+
+        {/* ================= PRODUCT GRID ================= */}
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <Loader2 className="w-12 h-12 text-cyan-400 animate-spin mb-4" />
+            <span className="text-cyan-400 font-bold tracking-[0.3em]">LOADING DATA...</span>
+          </div>
+        ) : (
+          <>
+            {data && data.data.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {data.data.map((p) => (
+                  <ProductCard key={p._id} product={p} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-20 border border-dashed border-cyan-500/20 bg-cyan-500/5 backdrop-blur-sm">
+                <p className="text-cyan-500/50 font-bold uppercase tracking-widest">Không tìm thấy sản phẩm nào</p>
+              </div>
+            )}
+
+            {/* ================= PAGINATION ================= */}
+            {data && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="mt-20 flex justify-center items-center gap-3"
+              >
+                <button
+                  className="group relative w-12 h-12 flex items-center justify-center border border-cyan-500/40 bg-white/5 backdrop-blur-md hover:bg-cyan-500 hover:text-black transition-all disabled:opacity-20"
+                  onClick={() => setUrl({ page: data.page - 1 })}
+                  disabled={!data.hasPrev}
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                  <div className="absolute -inset-[1px] border border-cyan-400 opacity-0 group-hover:opacity-100 blur-sm transition-opacity" />
+                </button>
+
+                <div className="flex items-center gap-2">
+                  {data.totalPages <= 7 ? (
+                    // Hiển thị tất cả trang nếu <= 7 trang
+                    [...Array(data.totalPages)].map((_, i) => {
+                      const pageNum = i + 1;
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => setUrl({ page: pageNum })}
+                          className={`w-12 h-12 font-black border backdrop-blur-md transition-all ${
+                            data.page === pageNum
+                              ? "bg-cyan-500 border-cyan-400 text-black shadow-[0_0_15px_rgba(0,247,255,0.4)]"
+                              : "border-cyan-500/20 bg-white/5 text-cyan-500 hover:border-cyan-500"
+                          }`}
+                        >
+                          {String(pageNum).padStart(2, '0')}
+                        </button>
+                      );
+                    })
+                  ) : (
+                    // Logic cho nhiều trang hơn
+                    <>
+                      {[...Array(data.totalPages)].map((_, i) => {
+                        const pageNum = i + 1;
+                        if (pageNum === 1 || pageNum === data.totalPages || (pageNum >= data.page - 1 && pageNum <= data.page + 1)) {
+                          return (
+                            <button
+                              key={pageNum}
+                              onClick={() => setUrl({ page: pageNum })}
+                              className={`w-12 h-12 font-black border backdrop-blur-md transition-all ${
+                                data.page === pageNum
+                                  ? "bg-cyan-500 border-cyan-400 text-black shadow-[0_0_15px_rgba(0,247,255,0.4)]"
+                                  : "border-cyan-500/20 bg-white/5 text-cyan-500 hover:border-cyan-500"
+                              }`}
+                            >
+                              {String(pageNum).padStart(2, '0')}
+                            </button>
+                          );
+                        }
+                        if (pageNum === data.page - 2 || pageNum === data.page + 2) {
+                          return <span key={pageNum} className="text-cyan-800 font-bold px-1">...</span>;
+                        }
+                        return null;
+                      })}
+                    </>
+                  )}
+                </div>
+
+                <button
+                  className="group relative w-12 h-12 flex items-center justify-center border border-cyan-500/40 bg-white/5 backdrop-blur-md hover:bg-cyan-500 hover:text-black transition-all disabled:opacity-20"
+                  onClick={() => setUrl({ page: data.page + 1 })}
+                  disabled={!data.hasNext}
+                >
+                  <ChevronRight className="w-5 h-5" />
+                  <div className="absolute -inset-[1px] border border-cyan-400 opacity-0 group-hover:opacity-100 blur-sm transition-opacity" />
+                </button>
+              </motion.div>
+            )}
+          </>
+        )}
+      </div>
 
       <SiteFooter />
-    </>
+    </main>
   );
 }
-
-const values = [
-  {
-    title: "HYPER SPEED",
-    desc: "Tối ưu tốc độ xử lý với công nghệ AI tiên tiến, đảm bảo trải nghiệm mượt mà trên mọi thiết bị.",
-    icon: Zap,
-  },
-  {
-    title: "QUANTUM TECH",
-    desc: "Kiến trúc hệ thống thế hệ mới, dễ dàng mở rộng và tích hợp với các nền tảng blockchain.",
-    icon: Cpu,
-  },
-  {
-    title: "CYBER SHIELD",
-    desc: "Bảo mật đa lớp với mã hóa quân sự, bảo vệ dữ liệu người dùng ở mức độ tối đa.",
-    icon: ShieldCheck,
-  },
-];
