@@ -12,16 +12,8 @@ export type ProductCardProps = {
 };
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const {
-    title,
-    price,
-    slug,
-    images,
-    stock,
-    brand,
-    rating,
-    description,
-  } = product;
+  const { title, price, slug, images, stock, brand, rating, description } =
+    product;
 
   const imageSrc =
     Array.isArray(images) && images[0] ? images[0] : "/ham.png";
@@ -32,37 +24,24 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <motion.div
       className="group relative mx-auto w-full max-w-sm"
-      /* ================= RUNG DỮ DỘI ================= */
       whileHover={{
         scale: 1.05,
-        x: [0, -3, 3, -3, 3, 0],
-        y: [0, 2, -2, 2, -2, 0],
-        rotateZ: [0, -1.5, 1.5, -1.5, 1.5, 0],
+        rotateZ: [0, -1, 1, -1, 1, 0],
       }}
-      transition={{
-        duration: 0.25,
-        repeat: Infinity,
-        repeatType: "loop",
-      }}
+      transition={{ duration: 0.3 }}
     >
-      {/* ⚡ ELECTRIC BORDER */}
-      <div className="pointer-events-none absolute inset-[-3px] rounded-[30px] electric-border opacity-0 group-hover:opacity-100 transition-opacity duration-100" />
+      {/* ELECTRIC BLUE BORDER */}
+      <div className="pointer-events-none absolute inset-[-3px] rounded-[30px] electric-border opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
 
-      {/* ================= CARD BODY ================= */}
-      <div className="relative overflow-hidden rounded-[28px] border border-gray-200 bg-white">
+      <div className="relative overflow-hidden rounded-[28px] border border-blue-100 bg-white group-hover:shadow-[0_0_40px_rgba(59,130,246,0.45)] transition-shadow duration-300">
         <Link href={`/shop/${slug}`}>
-          {/* ================= IMAGE ================= */}
+          {/* IMAGE */}
           <div className="relative aspect-square overflow-hidden">
-            {/* ⚡ LIGHTNING */}
-            <span className="lightning l1" />
-            <span className="lightning l2" />
-            <span className="lightning l3" />
-
             <Image
               src={imageSrc}
               alt={title}
               fill
-              className="object-cover"
+              className="object-cover transition-transform duration-500 group-hover:scale-110"
             />
 
             {outOfStock && (
@@ -72,13 +51,13 @@ export default function ProductCard({ product }: ProductCardProps) {
             )}
 
             {isDeal && !outOfStock && (
-              <span className="deal-badge absolute right-3 top-3 z-10 rounded-full bg-yellow-400 px-4 py-1 text-xs font-black text-black">
+              <span className="absolute right-3 top-3 z-10 rounded-full bg-blue-600 px-4 py-1 text-xs font-black text-white animate-pulse">
                 DEAL ⚡
               </span>
             )}
           </div>
 
-          {/* ================= CONTENT ================= */}
+          {/* CONTENT */}
           <div className="p-6">
             <h3 className="text-sm font-extrabold line-clamp-2">
               {title}
@@ -88,7 +67,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               {description}
             </p>
 
-            <div className="mt-4 text-xl font-black text-yellow-500">
+            <div className="mt-4 text-xl font-black text-blue-600 drop-shadow-[0_0_8px_rgba(37,99,235,0.6)]">
               {formatVND(price)}
             </div>
 
@@ -98,25 +77,20 @@ export default function ProductCard({ product }: ProductCardProps) {
             </div>
 
             <div className="mt-6">
-              <AddToCartButton
-                product={product}
-                disabled={outOfStock}
-              />
+              <AddToCartButton product={product} disabled={outOfStock} />
             </div>
           </div>
         </Link>
       </div>
 
-      {/* ================= STYLES ================= */}
       <style jsx>{`
-        /* ===== ELECTRIC BORDER ===== */
         .electric-border {
           background: linear-gradient(
             120deg,
             transparent 30%,
-            #ffffff 40%,
-            #facc15 50%,
-            #ec4899 60%,
+            #3b82f6 40%,
+            #60a5fa 50%,
+            #2563eb 60%,
             transparent 70%
           );
           background-size: 300% 300%;
@@ -130,76 +104,6 @@ export default function ProductCard({ product }: ProductCardProps) {
           }
           to {
             background-position: 300% 300%;
-          }
-        }
-
-        /* ===== LIGHTNING ===== */
-        .lightning {
-          position: absolute;
-          inset: 0;
-          opacity: 0;
-          background: linear-gradient(
-            90deg,
-            transparent 45%,
-            white 50%,
-            transparent 55%
-          );
-          clip-path: polygon(
-            50% 0%,
-            55% 15%,
-            45% 30%,
-            60% 45%,
-            40% 60%,
-            55% 75%,
-            50% 100%
-          );
-          filter: drop-shadow(0 0 16px white);
-        }
-
-        .group:hover .lightning {
-          animation: strike 0.2s infinite;
-        }
-
-        .l2 {
-          animation-delay: 0.06s;
-        }
-
-        .l3 {
-          animation-delay: 0.12s;
-        }
-
-        @keyframes strike {
-          0% {
-            opacity: 0;
-          }
-          50% {
-            opacity: 1;
-          }
-          100% {
-            opacity: 0;
-          }
-        }
-
-        /* ===== DEAL BADGE (CỰC MẠNH) ===== */
-        .deal-badge {
-          animation: dealCrazy 0.2s infinite;
-        }
-
-        @keyframes dealCrazy {
-          0% {
-            transform: scale(1) rotate(0deg);
-          }
-          25% {
-            transform: scale(1.25) rotate(-10deg);
-          }
-          50% {
-            transform: scale(0.9) rotate(10deg);
-          }
-          75% {
-            transform: scale(1.3) rotate(-12deg);
-          }
-          100% {
-            transform: scale(1) rotate(0deg);
           }
         }
       `}</style>
