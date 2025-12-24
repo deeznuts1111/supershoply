@@ -1,97 +1,59 @@
-import "./globals.css";
 import type { Metadata } from "next";
-import { Be_Vietnam_Pro } from "next/font/google";
-import SiteHeader from "@/components/SiteHeader";
-import Providers from "./providers";
+import Link from "next/link";
+import { headers } from "next/headers";
+import { Terminal, ChevronRight } from "lucide-react";
 
-/* ================= FONT ================= */
-const beVietnam = Be_Vietnam_Pro({
-  subsets: ["latin", "vietnamese"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-be-vietnam",
-});
-
-/* ================= META ================= */
-export const metadata: Metadata = {
-  title: "Phúc Electronics",
-  description: "Future tech, today",
+export const metadata: Metadata = { 
+  title: "Shop — Phúc Sigma",
+  description: "Khám phá kho công nghệ tiên tiến với hàng ngàn sản phẩm chất lượng cao"
 };
 
-/* ================= LAYOUT ================= */
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function ShopLayout({ children }: { children: React.ReactNode }) {
+  const pathname = (await headers()).get("x-pathname") || "/shop";
+  const isDetail = pathname.startsWith("/shop/") && pathname.split("/").length > 2;
+
   return (
-    <html lang="vi" suppressHydrationWarning>
-      <head>
-        <style dangerouslySetInnerHTML={{ __html: `
-          @keyframes grid {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(60px); }
-          }
+    <section className="relative">
+      {/* Breadcrumb - Futuristic Style */}
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8 pb-4">
+        <div className="relative inline-flex items-center gap-2 px-4 py-2 bg-[#0a1628]/60 backdrop-blur-md border border-cyan-500/30 overflow-hidden group hover:border-cyan-400/60 transition-all">
+          {/* Corner Accents */}
+          <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-cyan-400" />
+          <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-cyan-400" />
           
-          @keyframes beam {
-            0%, 100% { opacity: 0; transform: translateY(0); }
-            50% { opacity: 1; transform: translateY(100px); }
-          }
+          {/* Glow Effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/0 to-blue-500/0 group-hover:from-cyan-500/10 group-hover:to-blue-500/10 transition-all duration-500" />
           
-          @keyframes float {
-            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            50% { transform: translateY(-100px) translateX(50px); }
-          }
-        `}} />
-      </head>
-      <body
-        className={`
-          ${beVietnam.variable}
-          min-h-screen
-          font-sans
-          text-white
-          bg-[#0a0e27]
-          overflow-x-hidden
-          relative
-        `}
-      >
-        {/* ===== BACKGROUND EFFECTS ===== */}
-        <div className="pointer-events-none fixed inset-0 z-[-1]">
-          {/* Animated Grid */}
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(0,247,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,247,255,0.03)_1px,transparent_1px)] bg-[size:60px_60px] [animation:grid_20s_linear_infinite]" />
+          <Terminal size={14} className="text-cyan-400 relative z-10" />
           
-          {/* Diagonal Scanlines */}
-          <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,247,255,0.03)_2px,rgba(0,247,255,0.03)_4px)]" />
-          
-          {/* Multiple Neon Glows */}
-          <div className="absolute top-[-20%] left-[10%] w-[600px] h-[600px] rounded-full bg-cyan-500/20 blur-[150px] animate-pulse" />
-          <div className="absolute bottom-[-20%] right-[10%] w-[500px] h-[500px] rounded-full bg-blue-600/15 blur-[120px] animate-pulse [animation-delay:1s]" />
-          <div className="absolute top-[40%] left-[60%] w-[400px] h-[400px] rounded-full bg-purple-600/10 blur-[100px] animate-pulse [animation-delay:2s]" />
-          
-          {/* Holographic Corner Effects */}
-          <div className="absolute top-0 left-0 w-[300px] h-[300px] bg-gradient-to-br from-cyan-500/10 to-transparent" />
-          <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-gradient-to-tl from-blue-500/10 to-transparent" />
-          
-          {/* Moving Light Beams */}
-          <div className="absolute top-0 left-1/4 w-[2px] h-full bg-gradient-to-b from-transparent via-cyan-400/50 to-transparent [animation:beam_8s_ease-in-out_infinite]" />
-          <div className="absolute top-0 right-1/3 w-[2px] h-full bg-gradient-to-b from-transparent via-blue-400/50 to-transparent [animation:beam_6s_ease-in-out_infinite] [animation-delay:2s]" />
-          
-          {/* Glitch Effect Overlay */}
-          <div className="absolute inset-0 opacity-[0.02] bg-[url('/noise.png')] mix-blend-overlay" />
+          <nav className="flex items-center gap-2 text-xs font-bold tracking-wider relative z-10">
+            <Link 
+              className="text-gray-400 hover:text-cyan-400 transition-colors uppercase" 
+              href="/"
+            >
+              Home
+            </Link>
+            
+            <ChevronRight size={12} className="text-gray-600" />
+            
+            <Link 
+              className={`${isDetail ? 'text-gray-400 hover:text-cyan-400' : 'text-cyan-400'} transition-colors uppercase`}
+              href="/shop"
+            >
+              Shop
+            </Link>
+            
+            {isDetail && (
+              <>
+                <ChevronRight size={12} className="text-gray-600" />
+                <span className="text-white uppercase">Product Detail</span>
+              </>
+            )}
+          </nav>
         </div>
+      </div>
 
-        <Providers>
-          <SiteHeader/>
-
-          {/* ===== MAIN CONTENT ===== */}
-          <main className="relative">
-            <div className="container mx-auto max-w-6xl px-4 py-10">
-              {children}
-            </div>
-          </main>
-        </Providers>
-      </body>
-    </html>
+      {children}
+    </section>
   );
 }
