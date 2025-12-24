@@ -4,11 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { Search, Menu, X, ShoppingBag } from "lucide-react";
+import { Search, Menu, X, ShoppingBag, LogIn } from "lucide-react"; // Thêm LogIn icon
 import CartIndicator from "@/components/CartIndicator";
 import { cn } from "@/lib/cn";
 
 export default function SiteHeader() {
+  // ... các biến state giữ nguyên
   const pathname = usePathname();
   const router = useRouter();
   const [q, setQ] = useState("");
@@ -39,17 +40,17 @@ export default function SiteHeader() {
       className="sticky top-0 z-50 backdrop-blur-xl border-b border-blue-100"
     >
       <div className="container mx-auto max-w-7xl px-4 h-16 flex items-center justify-between gap-4">
-        {/* LOGO */}
+        {/* LOGO - Giữ nguyên */}
         <Link href="/" className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/40">
             <ShoppingBag className="w-5 h-5 text-white" />
           </div>
           <span className="text-xl font-black hidden sm:block">
-            Shoply<span className="text-blue-600">.</span>
+            Sigma<span className="text-blue-600">.</span>
           </span>
         </Link>
 
-        {/* NAV */}
+        {/* NAV - Giữ nguyên */}
         <nav className="hidden md:flex items-center gap-2 bg-blue-50 p-1 rounded-full">
           {nav.map((item) => {
             const active = pathname === item.href;
@@ -70,9 +71,9 @@ export default function SiteHeader() {
           })}
         </nav>
 
-        {/* ACTIONS */}
+        {/* ACTIONS - Thêm nút Đăng nhập */}
         <div className="flex items-center gap-3">
-          {/* SEARCH */}
+          {/* SEARCH - Giữ nguyên */}
           <div className="relative">
             <AnimatePresence>
               {isSearchOpen && (
@@ -104,8 +105,17 @@ export default function SiteHeader() {
 
           <CartIndicator />
 
+          {/* NÚT ĐĂNG NHẬP (MỚI THÊM) */}
+          <Link href="/login" className="hidden sm:block">
+            <button className="px-5 py-2 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-2">
+              <LogIn size={18} />
+              Đăng nhập
+            </button>
+          </Link>
+
+          {/* ĐĂNG KÝ - Giữ nguyên */}
           <Link href="/register">
-            <button className="hidden sm:block px-5 py-2 text-sm font-bold bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-lg shadow-blue-500/40">
+            <button className="hidden sm:block px-5 py-2 text-sm font-bold bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-lg shadow-blue-500/40 transition-transform active:scale-95">
               Đăng ký
             </button>
           </Link>
