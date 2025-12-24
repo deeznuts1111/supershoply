@@ -1,6 +1,6 @@
 "use client";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState, Suspense } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ProductCard from "@/components/ProductCard";
 import SiteFooter from "@/components/SiteFooter"; 
 import { useProductsQuery } from "@/hooks/useProductsQuery";
@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 
 const LIMIT = 12;
 
-function ShopPageContent() {
+export default function ShopPage() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -229,18 +229,5 @@ function ShopPageContent() {
 
       <SiteFooter />
     </main>
-  );
-}
-
-export default function ShopPage() {
-  return (
-    <Suspense fallback={
-      <div className="flex flex-col items-center justify-center py-20 min-h-screen">
-        <Loader2 className="w-12 h-12 text-cyan-400 animate-spin mb-4" />
-        <span className="text-cyan-400 font-bold tracking-[0.3em]">LOADING...</span>
-      </div>
-    }>
-      <ShopPageContent />
-    </Suspense>
   );
 }
