@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 
-const API_URL = "https://supershoply-api.onrender.com";
+const API_URL = "https://supershoply-api.onrender.com/api/v1";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
 
     // Forward request sang backend API
-    const response = await fetch(`${API_URL}/api/checkout`, {
+    const response = await fetch(`${API_URL}/checkout`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
