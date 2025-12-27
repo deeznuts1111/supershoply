@@ -25,7 +25,7 @@ export default function ProductCard({ product }: { product: Product }) {
       <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/0 via-blue-500/0 to-purple-500/0 group-hover:from-cyan-500/20 group-hover:via-blue-500/20 group-hover:to-purple-500/20 blur-xl transition-all duration-500 rounded-lg" />
       
       {/* Main Card */}
-      <div className="relative h-full bg-gradient-to-br from-[#0a1628]/95 via-[#0d1b33]/95 to-[#0a0e27]/95 backdrop-blur-sm border border-cyan-500/20 group-hover:border-cyan-400/60 transition-all duration-300 overflow-hidden">
+      <div className="relative h-full bg-gradient-to-br from-[#0a1628]/95 via-[#0d1b33]/95 to-[#0a0e27]/95 backdrop-blur-sm border border-cyan-500/20 group-hover:border-cyan-400/60 transition-all duration-300 overflow-hidden pointer-events-none">
         {/* Animated Corner Accents */}
         <div className="absolute top-0 left-0 w-12 h-12 border-t-[3px] border-l-[3px] border-cyan-400/40 group-hover:border-cyan-300 transition-all duration-300" />
         <div className="absolute top-0 right-0 w-8 h-8 border-t-[2px] border-r-[2px] border-blue-400/30 group-hover:border-blue-300 transition-all duration-300" />
@@ -35,7 +35,7 @@ export default function ProductCard({ product }: { product: Product }) {
         {/* Scan Line Effect */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-400/5 to-transparent translate-y-[-100%] group-hover:translate-y-[100%] transition-transform duration-1000 ease-in-out" />
 
-        <Link href={`/shop/${slug}`} className="block">
+        <Link href={`/shop/${slug}`} className="block pointer-events-auto">
           {/* Image Container with Holographic Effect */}
           <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-[#050b15] to-[#0a1220]">
             {/* Holographic Grid Overlay */}
@@ -45,9 +45,8 @@ export default function ProductCard({ product }: { product: Product }) {
               src={imageSrc}
               alt={title}
               fill
-              className="object-cover transition-all duration-500 group-hover:scale-105 group-hover:drop-shadow-[0_0_20px_rgba(0,247,255,0.3)]"
+              className="object-contain p-6 transition-all duration-500 group-hover:scale-105 group-hover:drop-shadow-[0_0_20px_rgba(0,247,255,0.3)]"
             />
-
             
             {/* Stock Badge */}
             {!outOfStock && stock !== undefined && stock < 10 && (
@@ -111,9 +110,33 @@ export default function ProductCard({ product }: { product: Product }) {
           <div className="relative">
             {/* Button Glow Effect */}
             <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="[&_button]:text-white [&_button]:font-bold">
+            <div
+              className="
+                pointer-events-auto
+                [&_button]:w-full
+                [&_button]:bg-transparent
+                [&_button]:text-white
+                [&_button]:font-bold
+                [&_button]:border
+                [&_button]:border-cyan-400/40
+                [&_button]:transition-all
+                [&_button]:duration-200
+
+                [&_button:hover]:bg-blue-600
+                [&_button:hover]:border-blue-400
+                [&_button:hover]:shadow-[0_0_15px_rgba(37,99,235,0.6)]
+                [&_button:hover]:scale-[1.02]
+
+                [&_button:disabled]:bg-transparent
+                [&_button:disabled]:border-gray-600
+                [&_button:disabled]:text-gray-500
+                [&_button:disabled]:cursor-not-allowed
+              "
+              onClick={(e) => e.stopPropagation()}
+            >
               <AddToCartButton product={product} disabled={outOfStock} />
             </div>
+
           </div>
         </div>
 
@@ -123,4 +146,3 @@ export default function ProductCard({ product }: { product: Product }) {
     </motion.div>
   );
 }
-
