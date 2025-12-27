@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const API_URL = "https://supershoply-api.onrender.com";
+const API_URL = "https://supershoply-api.onrender.com/api/v1";
 
 export async function GET(
   _req: Request,
@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const slug = params.slug;
-    const response = await fetch(`${API_URL}/api/products/${slug}`, {
+    const response = await fetch(`${API_URL}/products/${slug}`, {
       cache: 'no-store'
     });
     
