@@ -45,8 +45,9 @@ export default function ProductCard({ product }: { product: Product }) {
               src={imageSrc}
               alt={title}
               fill
-              className="object-contain p-6 transition-all duration-500 group-hover:scale-105 group-hover:drop-shadow-[0_0_20px_rgba(0,247,255,0.3)]"
+              className="object-cover transition-all duration-500 group-hover:scale-105 group-hover:drop-shadow-[0_0_20px_rgba(0,247,255,0.3)]"
             />
+
             
             {/* Stock Badge */}
             {!outOfStock && stock !== undefined && stock < 10 && (
@@ -122,3 +123,4 @@ export default function ProductCard({ product }: { product: Product }) {
     </motion.div>
   );
 }
+
