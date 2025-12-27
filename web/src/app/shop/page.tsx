@@ -14,6 +14,7 @@ export default function ShopPage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  // 🔹 SOURCE OF TRUTH
   const pageParam = Math.max(parseInt(searchParams.get("page") || "1", 10), 1);
   const qParam = searchParams.get("q") || "";
 
@@ -25,6 +26,11 @@ export default function ShopPage() {
     [pageParam, qParam]
   );
   const { data, isLoading } = useProductsQuery(queryArgs);
+
+  // 🔹 FRONTEND PAGINATION CALC (QUAN TRỌNG)
+  const totalPages = data ? Math.ceil(data.total / LIMIT) : 1;
+  const hasPrev = pageParam > 1;
+  const hasNext = pageParam < totalPages;
 
   function setUrl(next: { page?: number; q?: string | null }) {
     const sp = new URLSearchParams(searchParams.toString());
@@ -43,7 +49,7 @@ export default function ShopPage() {
 
   return (
     <main className="relative min-h-screen">
-      {/* Background Effects */}
+      {/* ================= BACKGROUND ================= */}
       <div className="fixed inset-0 -z-10 pointer-events-none">
         <div className="absolute top-20 left-[10%] w-[500px] h-[500px] rounded-full bg-cyan-500/10 blur-[120px] animate-pulse" />
         <div className="absolute bottom-20 right-[10%] w-[400px] h-[400px] rounded-full bg-blue-600/10 blur-[100px] animate-pulse [animation-delay:1s]" />
@@ -78,37 +84,29 @@ export default function ShopPage() {
               </p>
             </div>
 
-            <div className="flex gap-10">
-              {data && (
-                <>
-                  <div className="text-center">
-                    <div
-                      className="text-3xl font-black text-white uppercase"
-                      style={{ textShadow: "2px 2px 0px #0066FF" }}
-                    >
-                      {data.total}+
-                    </div>
-                    <div className="text-xs font-black tracking-[0.2em] mt-1 text-blue-500 uppercase">
-                      PRODUCTS
-                    </div>
+            {data && (
+              <div className="flex gap-10">
+                <div className="text-center">
+                  <div className="text-3xl font-black text-white" style={{ textShadow: "2px 2px 0px #0066FF" }}>
+                    {data.total}+
                   </div>
-
-                  <div className="w-[2px] bg-gradient-to-b from-transparent via-cyan-400/30 to-transparent" />
-
-                  <div className="text-center">
-                    <div
-                      className="text-3xl font-black text-white uppercase"
-                      style={{ textShadow: "2px 2px 0px #0066FF" }}
-                    >
-                      TRANG {pageParam}
-                    </div>
-                    <div className="text-xs font-black tracking-[0.2em] mt-1 text-blue-500 uppercase">
-                      CURRENT PAGE
-                    </div>
+                  <div className="text-xs font-black tracking-[0.2em] mt-1 text-blue-500">
+                    PRODUCTS
                   </div>
-                </>
-              )}
-            </div>
+                </div>
+
+                <div className="w-[2px] bg-gradient-to-b from-transparent via-cyan-400/30 to-transparent" />
+
+                <div className="text-center">
+                  <div className="text-3xl font-black text-white" style={{ textShadow: "2px 2px 0px #0066FF" }}>
+                    TRANG {pageParam}
+                  </div>
+                  <div className="text-xs font-black tracking-[0.2em] mt-1 text-blue-500">
+                    CURRENT PAGE
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </motion.div>
 
@@ -131,7 +129,7 @@ export default function ShopPage() {
               />
               <button
                 type="submit"
-                className="absolute right-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-black px-6 py-2.5 font-black text-sm tracking-wider hover:shadow-[0_0_20px_rgba(0,247,255,0.6)]"
+                className="absolute right-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-black px-6 py-2.5 font-black text-sm tracking-wider"
               >
                 SEARCH
               </button>
@@ -139,11 +137,13 @@ export default function ShopPage() {
           </form>
         </motion.div>
 
-        {/* ================= PRODUCT GRID ================= */}
+        {/* ================= GRID ================= */}
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="w-12 h-12 text-cyan-400 animate-spin mb-4" />
-            <span className="text-cyan-400 font-bold tracking-[0.3em]">LOADING DATA...</span>
+            <span className="text-cyan-400 font-bold tracking-[0.3em]">
+              LOADING DATA...
+            </span>
           </div>
         ) : (
           <>
@@ -162,7 +162,7 @@ export default function ShopPage() {
             )}
 
             {/* ================= PAGINATION ================= */}
-            {data && (
+            {data && totalPages > 1 && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -170,29 +170,29 @@ export default function ShopPage() {
                 className="mt-20 flex justify-center items-center gap-3"
               >
                 <button
-                  className="group relative w-12 h-12 flex items-center justify-center border border-cyan-500/40 bg-white/5 backdrop-blur-md hover:bg-cyan-500 hover:text-black transition-all disabled:opacity-20"
+                  className="w-12 h-12 flex items-center justify-center border border-cyan-500/40 bg-white/5 disabled:opacity-30"
                   onClick={() => setUrl({ page: pageParam - 1 })}
-                  disabled={pageParam <= 1}
+                  disabled={!hasPrev}
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft />
                 </button>
 
-                <div className="flex items-center gap-2">
-                  {[...Array(data.totalPages)].map((_, i) => {
+                <div className="flex gap-2">
+                  {[...Array(totalPages)].map((_, i) => {
                     const pageNum = i + 1;
                     if (
                       pageNum === 1 ||
-                      pageNum === data.totalPages ||
+                      pageNum === totalPages ||
                       (pageNum >= pageParam - 1 && pageNum <= pageParam + 1)
                     ) {
                       return (
                         <button
                           key={pageNum}
                           onClick={() => setUrl({ page: pageNum })}
-                          className={`w-12 h-12 font-black border backdrop-blur-md transition-all ${
-                            pageParam === pageNum
-                              ? "bg-cyan-500 border-cyan-400 text-black shadow-[0_0_15px_rgba(0,247,255,0.4)]"
-                              : "border-cyan-500/20 bg-white/5 text-cyan-500 hover:border-cyan-500"
+                          className={`w-12 h-12 font-black border ${
+                            pageNum === pageParam
+                              ? "bg-cyan-500 text-black"
+                              : "border-cyan-500/20 bg-white/5 text-cyan-500"
                           }`}
                         >
                           {String(pageNum).padStart(2, "0")}
@@ -200,22 +200,18 @@ export default function ShopPage() {
                       );
                     }
                     if (pageNum === pageParam - 2 || pageNum === pageParam + 2) {
-                      return (
-                        <span key={pageNum} className="text-cyan-800 font-bold px-1">
-                          ...
-                        </span>
-                      );
+                      return <span key={pageNum} className="px-1 text-cyan-800">...</span>;
                     }
                     return null;
                   })}
                 </div>
 
                 <button
-                  className="group relative w-12 h-12 flex items-center justify-center border border-cyan-500/40 bg-white/5 backdrop-blur-md hover:bg-cyan-500 hover:text-black transition-all disabled:opacity-20"
+                  className="w-12 h-12 flex items-center justify-center border border-cyan-500/40 bg-white/5 disabled:opacity-30"
                   onClick={() => setUrl({ page: pageParam + 1 })}
-                  disabled={pageParam >= data.totalPages}
+                  disabled={!hasNext}
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight />
                 </button>
               </motion.div>
             )}
