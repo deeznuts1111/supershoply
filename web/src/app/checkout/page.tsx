@@ -3,6 +3,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { calcTotals } from "@/lib/checkout";
+import { Suspense } from "react";
 
 const API_URL = "https://supershoply-api.onrender.com";
 
@@ -12,7 +13,7 @@ function formatVND(n: number) {
   return n.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
 }
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const sp = useSearchParams();
   const router = useRouter();
 
@@ -310,9 +311,17 @@ export default function CheckoutPage() {
           <span>{formatVND(totals.total)}</span>
         </div>
         <p className="text-xs text-gray-500 mt-3">
-          * Phí ship thay đổi theo địa chỉ & khuyến mãi.
+          * Phí ship thay đổi theo địa chỉ & khuyến mãi (giả lập).
         </p>
       </aside>
     </section>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div className="py-12 text-center">Đang tải...</div>}>
+      <CheckoutContent />
+    </Suspense>
   );
 }
