@@ -1,29 +1,50 @@
 import type { Product } from "@/types/product";
-import type { MinProduct } from "@/mock/min-products";
-import { PRODUCTS } from "@/mock/products";
-import { MIN_PRODUCTS } from "@/mock/min-products";
 
-export function toProduct(p: MinProduct): Product {
-  return {
-    _id: `legacy-${p.slug}`,
-    title: p.title,
-    slug: p.slug,
-    price: p.price,
-    images: [p.image ?? "/placeholder.png"],
-    stock: p.stock ?? 0,
-  };
+const API_URL = "https://supershoply-api.onrender.com";
+
+// Hàm gọi API lấy sản phẩm theo slug
+export async function getProductBySlug(slug: string): Promise<Product | null> {
+  try {
+    const response = await fetch(`${API_URL}/api/products/${slug}`, {
+      cache: 'no-store' // Hoặc dùng next: { revalidate: 60 } nếu muốn cache
+    });
+    
+    if (!response.ok) {
+      return null;
+    }
+    
+    const product = await response.json();
+    return product;
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    return null;
+  }
 }
 
-export function asProduct(p: Product | MinProduct): Product {
-  const maybe = p as Product;
-  if (typeof maybe._id === "string" && Array.isArray(maybe.images)) return maybe;
-  return toProduct(p as MinProduct);
-}
+// Hàm lấy tất cả sản phẩm với phân trang
+export async function getProducts(params?: {
+  page?: number;
+  limit?: number;
+  q?: string;
+}) {
+  try {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.set('page', params.page.toString());
+    if (params?.limit) searchParams.set('limit', params.limit.toString());
+    if (params?.q) searchParams.set('q', params.q);
 
-//Thêm hàm hợp nhất dữ liệu theo slug
-export function getProductBySlug(slug: string): Product | null {
-  const p = PRODUCTS.find((x) => x.slug === slug);
-  if (p) return p;
-  const m = MIN_PRODUCTS.find((x) => x.slug === slug);
-  return m ? toProduct(m) : null;
+    const response = await fetch(
+      `${API_URL}/api/products?${searchParams.toString()}`,
+      { cache: 'no-store' }
+    );
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch products');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return { data: [], page: 1, limit: 12, total: 0, hasNext: false };
+  }
 }
