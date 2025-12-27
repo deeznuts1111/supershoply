@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { calcTotals } from "@/lib/checkout";
 import { Suspense } from "react";
 
-const API_URL = "https://supershoply-api.onrender.com";
+const API_URL = "https://supershoply-api.onrender.com/api/v1";
 
 type PM = "cod" | "banking" | "momo";
 
@@ -45,7 +45,7 @@ function CheckoutContent() {
 
       try {
         const promises = parsedItems.map((item) =>
-          fetch(`${API_URL}/api/products/${item.slug}`).then((r) => r.json())
+          fetch(`${API_URL}/products/${item.slug}`).then((r) => r.json())
         );
         const fetchedProducts = await Promise.all(promises);
         
@@ -115,7 +115,7 @@ function CheckoutContent() {
         items,
       };
 
-      const response = await fetch(`${API_URL}/api/checkout`, {
+      const response = await fetch(`${API_URL}/checkout`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
