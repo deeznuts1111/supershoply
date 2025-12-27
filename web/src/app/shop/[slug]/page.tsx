@@ -8,7 +8,7 @@ import SiteFooter from "@/components/SiteFooter";
 import { getProductBySlug } from "@/lib/catalog";
 import AddToCartButton from "@/features/cart/AddToCartButton";
 
-const API_URL = "https://supershoply-api.onrender.com";
+const API_URL = "https://supershoply-api.onrender.com/api/v1";
 
 export async function generateMetadata({
   params,
@@ -27,7 +27,7 @@ async function getRandomProducts(
   count: number
 ): Promise<Product[]> {
   try {
-    const response = await fetch(`${API_URL}/api/products?limit=100`, {
+    const response = await fetch(`${API_URL}/products?limit=100`, {
       cache: "no-store",
     });
 
