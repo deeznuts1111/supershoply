@@ -1,25 +1,30 @@
 import { useQuery } from "@tanstack/react-query";
-import type { Product } from "@/types/product";
+import axios from "axios";
 
-export type ProductsResponse = {
-  data: Product[];
+type UseProductsQueryArgs = {
   page: number;
   limit: number;
-  total: number;
-  hasNext: boolean;
+  q?: string;
 };
 
-export function useProductsQuery(args: { page: number; limit: number; q?: string }) {
-  const { page, limit, q } = args;
-  return useQuery<ProductsResponse>({
-    queryKey: ["products", { page, limit, q: q ?? "" }],
+export function useProductsQuery({ page, limit, q }: UseProductsQueryArgs) {
+  return useQuery({
+    // 🔴 BẮT BUỘC: page + limit + q phải nằm trong queryKey
+    queryKey: ["products", page, limit, q],
+
+    // 🔴 BẮT BUỘC: truyền page vào params
     queryFn: async () => {
-      const params = new URLSearchParams({ page: String(page), limit: String(limit) });
-      if (q) params.set("q", q);
-      const res = await fetch(`/api/products?${params.toString()}`);
-      if (!res.ok) throw new Error("Failed to fetch products");
-      return (await res.json()) as ProductsResponse;
+      const res = await axios.get("/api/products", {
+        params: {
+          page,
+          limit,
+          q,
+        },
+      });
+      return res.data;
     },
-    placeholderData: (prev) => prev,
+
+    // Giữ data cũ khi chuyển trang (mượt hơn)
+    keepPreviousData: true,
   });
 }
