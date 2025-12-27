@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 
 type UseProductsQueryArgs = {
   page: number;
@@ -9,22 +8,24 @@ type UseProductsQueryArgs = {
 
 export function useProductsQuery({ page, limit, q }: UseProductsQueryArgs) {
   return useQuery({
-    // 🔴 BẮT BUỘC: page + limit + q phải nằm trong queryKey
+    // 🔴 QUAN TRỌNG: page + limit + q phải có trong queryKey
     queryKey: ["products", page, limit, q],
 
-    // 🔴 BẮT BUỘC: truyền page vào params
     queryFn: async () => {
-      const res = await axios.get("/api/products", {
-        params: {
-          page,
-          limit,
-          q,
-        },
-      });
-      return res.data;
+      const params = new URLSearchParams();
+      params.set("page", String(page));
+      params.set("limit", String(limit));
+      if (q) params.set("q", q);
+
+      const res = await fetch(`/api/products?${params.toString()}`);
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch products");
+      }
+
+      return res.json();
     },
 
-    // Giữ data cũ khi chuyển trang (mượt hơn)
     keepPreviousData: true,
   });
 }
