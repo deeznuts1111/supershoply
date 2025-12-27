@@ -1,11 +1,11 @@
 import type { Product } from "@/types/product";
 
-const API_URL = "https://supershoply-api.onrender.com";
+const API_URL = "https://supershoply-api.onrender.com/api/v1";
 
 // Hàm gọi API lấy sản phẩm theo slug
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   try {
-    const response = await fetch(`${API_URL}/api/products/${slug}`, {
+    const response = await fetch(`${API_URL}/products/${slug}`, {
       cache: 'no-store' // Hoặc dùng next: { revalidate: 60 } nếu muốn cache
     });
     
@@ -34,7 +34,7 @@ export async function getProducts(params?: {
     if (params?.q) searchParams.set('q', params.q);
 
     const response = await fetch(
-      `${API_URL}/api/products?${searchParams.toString()}`,
+      `${API_URL}/products?${searchParams.toString()}`,
       { cache: 'no-store' }
     );
     
