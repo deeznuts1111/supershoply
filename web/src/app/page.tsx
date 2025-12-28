@@ -69,7 +69,7 @@ function HomeContent() {
               className="mt-10 text-lg sm:text-xl text-[#0f172a] max-w-3xl mx-auto leading-relaxed font-semibold"
             >
               Khám phá thế giới công nghệ tương lai. Nền tảng thương mại điện tử 
-              <span className="text-blue-700 font-black"> thế hệ mới</span>, nơi hiện thực 
+              thế hệ mới, nơi hiện thực 
               gặp gỡ không gian ảo.
             </motion.p>
 
