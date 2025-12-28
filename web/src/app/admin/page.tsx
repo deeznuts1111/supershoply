@@ -170,6 +170,15 @@ function OrdersManager({ token }: { token: string }) {
             </tr>
           </thead>
           <tbody className="divide-y divide-cyan-400/10">
+            <tr className="bg-cyan-500/20 font-bold text-cyan-300">
+              <td className="px-4 py-3" colSpan={2}>
+                TỔNG DOANH THU
+              </td>
+              <td className="px-4 py-3 text-center text-lg">
+                {orders.reduce((sum, o) => sum + o.total, 0).toLocaleString()}đ
+              </td>
+              <td className="px-4 py-3" colSpan={3}></td>
+            </tr>
             {orders.map((o) => (
               <tr key={o._id} className="hover:bg-cyan-500/5">
                 <td className="px-4 py-3 font-mono text-cyan-400">
