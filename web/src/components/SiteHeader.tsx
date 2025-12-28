@@ -1,19 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { Search, Menu, X, ShoppingBag, LogIn } from "lucide-react"; // Thêm LogIn icon
+import { Search, Menu, X, ShoppingBag, LogOut } from "lucide-react";
 import CartIndicator from "@/components/CartIndicator";
 import { cn } from "@/lib/cn";
 
 export default function SiteHeader() {
-  // ... các biến state giữ nguyên
   const pathname = usePathname();
   const router = useRouter();
   const [q, setQ] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
 
   const { scrollY } = useScroll();
   const headerBg = useTransform(
@@ -21,6 +21,28 @@ export default function SiteHeader() {
     [0, 60],
     ["rgba(255,255,255,0)", "rgba(255,255,255,0.9)"]
   );
+
+  // Load user từ localStorage khi component mount
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const userStr = localStorage.getItem("user");
+    
+    if (token && userStr) {
+      try {
+        const userData = JSON.parse(userStr);
+        setUser(userData);
+      } catch (error) {
+        console.error("Failed to parse user data:", error);
+      }
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    router.push("/");
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +62,7 @@ export default function SiteHeader() {
       className="sticky top-0 z-50 backdrop-blur-xl border-b border-blue-100"
     >
       <div className="container mx-auto max-w-7xl px-4 h-16 flex items-center justify-between gap-4">
-        {/* LOGO - Giữ nguyên */}
+        {/* LOGO */}
         <Link href="/" className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/40">
             <ShoppingBag className="w-5 h-5 text-white" />
@@ -50,7 +72,7 @@ export default function SiteHeader() {
           </span>
         </Link>
 
-        {/* NAV - Giữ nguyên */}
+        {/* NAV */}
         <nav className="hidden md:flex items-center gap-2 bg-blue-50 p-1 rounded-full">
           {nav.map((item) => {
             const active = pathname === item.href;
@@ -71,9 +93,9 @@ export default function SiteHeader() {
           })}
         </nav>
 
-        {/* ACTIONS - Thêm nút Đăng nhập */}
+        {/* ACTIONS */}
         <div className="flex items-center gap-3">
-          {/* SEARCH - Giữ nguyên */}
+          {/* SEARCH */}
           <div className="relative">
             <AnimatePresence>
               {isSearchOpen && (
@@ -105,20 +127,36 @@ export default function SiteHeader() {
 
           <CartIndicator />
 
-          {/* NÚT ĐĂNG NHẬP (MỚI THÊM) */}
-          <Link href="/login" className="hidden sm:block">
-            <button className="px-5 py-2 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-2">
-              <LogIn size={18} />
-              Đăng nhập
-            </button>
-          </Link>
-
-          {/* ĐĂNG KÝ - Giữ nguyên */}
-          <Link href="/register">
-            <button className="hidden sm:block px-5 py-2 text-sm font-bold bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-lg shadow-blue-500/40 transition-transform active:scale-95">
-              Đăng ký
-            </button>
-          </Link>
+          {/* AUTH SECTION */}
+          {user ? (
+            // Đã đăng nhập
+            <div className="hidden sm:flex items-center gap-3">
+              <span className="text-sm font-medium text-gray-700">
+                Chào mừng, <span className="text-blue-600 font-bold">{user.name}</span>
+              </span>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 text-sm font-bold text-red-600 hover:text-red-700 transition-colors flex items-center gap-2 hover:bg-red-50 rounded-full"
+              >
+                <LogOut size={18} />
+                Đăng xuất
+              </button>
+            </div>
+          ) : (
+            // Chưa đăng nhập
+            <div className="hidden sm:flex items-center gap-2">
+              <Link href="/login">
+                <button className="px-5 py-2 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors">
+                  Đăng nhập
+                </button>
+              </Link>
+              <Link href="/register">
+                <button className="px-5 py-2 text-sm font-bold bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full shadow-lg shadow-blue-500/40 transition-transform active:scale-95">
+                  Đăng ký
+                </button>
+              </Link>
+            </div>
+          )}
 
           <button className="md:hidden p-2 rounded-full hover:bg-blue-50">
             <Menu size={24} />
