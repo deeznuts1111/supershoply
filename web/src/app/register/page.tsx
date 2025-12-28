@@ -45,7 +45,7 @@ export default function RegisterPage() {
       
       // Redirect sau 1.5s
       setTimeout(() => {
-        router.push("/shop");
+        router.push("/login");
       }, 1500);
       
     } catch (error) {
@@ -142,4 +142,5 @@ export default function RegisterPage() {
     </main>
   );
 }
+
 
