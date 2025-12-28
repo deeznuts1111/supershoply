@@ -243,7 +243,7 @@ function CheckoutContent() {
                       className="w-full bg-[#0a0e27] border border-cyan-400/40 text-white px-4 py-3 focus:border-cyan-400 focus:outline-none focus:shadow-[0_0_10px_rgba(0,247,255,0.3)] transition-all"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="Enter your name..."
+                      placeholder="Tên của bạn..."
                       style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
                     />
                   </div>
@@ -269,7 +269,7 @@ function CheckoutContent() {
                       className="w-full bg-[#0a0e27] border border-cyan-400/40 text-white px-4 py-3 focus:border-cyan-400 focus:outline-none focus:shadow-[0_0_10px_rgba(0,247,255,0.3)] transition-all min-h-[100px]"
                       value={addr}
                       onChange={(e) => setAddr(e.target.value)}
-                      placeholder="Street, district, city..."
+                      placeholder="Đường, quận, huyện..."
                       style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
                     />
                   </div>
@@ -309,7 +309,7 @@ function CheckoutContent() {
                       className="w-full bg-[#0a0e27] border border-cyan-400/40 text-white px-4 py-3 focus:border-cyan-400 focus:outline-none focus:shadow-[0_0_10px_rgba(0,247,255,0.3)] transition-all min-h-[80px]"
                       value={note}
                       onChange={(e) => setNote(e.target.value)}
-                      placeholder="Order note (optional)..."
+                      placeholder="Ghi chú..."
                       style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
                     />
                   </div>
@@ -404,11 +404,11 @@ function CheckoutContent() {
 
                 <div className="space-y-3">
                   <div className="flex justify-between text-gray-300">
-                    <span>Subtotal:</span>
+                    <span>Tổng sản phẩm:</span>
                     <span className="font-bold text-white">{formatVND(totals.subtotal)}</span>
                   </div>
                   <div className="flex justify-between text-gray-300">
-                    <span>Shipping Fee:</span>
+                    <span>Phí ship:</span>
                     <span className="font-bold text-white">{formatVND(totals.shippingFee)}</span>
                   </div>
                   
@@ -422,7 +422,7 @@ function CheckoutContent() {
 
                 <div className="mt-6 p-4 border border-cyan-400/20 bg-[#0a0e27]/50">
                   <p className="text-xs text-gray-400 leading-relaxed" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-                    * Shipping fee varies by location & promotions. This is an estimated price for demo purposes.
+                    Giá ship thay đổi theo sản phẩm và khu vực.
                   </p>
                 </div>
               </div>
@@ -450,3 +450,4 @@ export default function CheckoutPage() {
     </Suspense>
   );
 }
+
