@@ -14,7 +14,7 @@ export default function CartPage() {
   if (!hydrated) return null;
 
   const items = state.items;
-  const shipping = items.length ? 15000 : 0;
+  const shipping = items.length ? 0 : 0;
   const total = subtotal + shipping;
 
   const handleGoToCheckout = () => {
@@ -129,7 +129,7 @@ export default function CartPage() {
               ================================================= */}
               <aside className="bg-[#0f172a] border border-cyan-400/30 rounded-xl p-6 h-fit sticky top-6">
                 <h2 className="text-xl font-black text-white border-b border-cyan-400/30 pb-3">
-                  TÓM TẮT
+                  SUMMARY
                 </h2>
 
                 <div className="mt-4 space-y-3 text-sm">
@@ -180,4 +180,5 @@ export default function CartPage() {
     </>
   );
 }
+
 
