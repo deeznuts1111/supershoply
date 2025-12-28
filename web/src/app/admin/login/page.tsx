@@ -35,6 +35,7 @@ export default function AdminLoginPage() {
   }
 
   return (
+  <>
     <main className="min-h-screen flex items-center justify-center bg-[#0a0e27] relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 -z-10">
