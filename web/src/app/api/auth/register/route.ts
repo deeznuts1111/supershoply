@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import { registerSchema } from "@/app/features/auth/schemas";
 
-const API_URL = "https://supershoply-api.onrender.com"; // Hardcode tạm
 export async function POST(req: Request) {
-  console.log("🔍 API_URL being used:", API_URL);
-  console.log("🔍 Full URL will be:", `${API_URL}/api/v1/auth/register`);
   try {
     const body = await req.json().catch(() => null);
     const parsed = registerSchema.safeParse(body);
@@ -17,7 +14,8 @@ export async function POST(req: Request) {
     }
 
     // Gọi đến backend API thực
-    const response = await fetch(`${API_URL}/api/v1/auth/register`, {
+    console.log("🚀 Calling backend API...");
+    const response = await fetch("https://supershoply-api.onrender.com/api/v1/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -27,7 +25,9 @@ export async function POST(req: Request) {
       }),
     });
 
+    console.log("📥 Backend response status:", response.status);
     const data = await response.json();
+    console.log("📦 Backend response data:", data);
 
     if (!response.ok) {
       return NextResponse.json(
@@ -47,13 +47,10 @@ export async function POST(req: Request) {
     });
 
   } catch (error) {
-    console.error("Register error:", error);
+    console.error("❌ Register error:", error);
     return NextResponse.json(
       { message: "Có lỗi xảy ra khi đăng ký" },
       { status: 500 }
     );
   }
 }
-
-
-
