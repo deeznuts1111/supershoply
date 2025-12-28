@@ -70,4 +70,61 @@ async function listOrders(req, res, next) {
   } catch (err) { next(err); }
 }
 
-module.exports = { createOrder, getOrderById, listOrders };
+// NEW: Update order status (admin only)
+async function updateOrderStatus(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ ok: false, error: { code: "BAD_ID", message: "Invalid order id" } });
+    }
+
+    if (!['pending', 'paid', 'canceled'].includes(status)) {
+      return res.status(400).json({ ok: false, error: { code: "INVALID_STATUS", message: "Status must be: pending, paid, or canceled" } });
+    }
+    
+    const order = await Order.findByIdAndUpdate(
+      id, 
+      { status }, 
+      { new: true, runValidators: true }
+    );
+    
+    if (!order) {
+      return res.status(404).json({ ok: false, error: { code: "NOT_FOUND", message: "Order not found" } });
+    }
+    
+    return res.json({ ok: true, order: order.toJSON() });
+  } catch (err) { 
+    next(err); 
+  }
+}
+
+// NEW: Delete order (admin only)
+async function deleteOrder(req, res, next) {
+  try {
+    const { id } = req.params;
+    
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ ok: false, error: { code: "BAD_ID", message: "Invalid order id" } });
+    }
+    
+    const deleted = await Order.findByIdAndDelete(id);
+    
+    if (!deleted) {
+      return res.status(404).json({ ok: false, error: { code: "NOT_FOUND", message: "Order not found" } });
+    }
+    
+    return res.json({ ok: true, deletedId: id });
+  } catch (err) { 
+    next(err); 
+  }
+}
+
+module.exports = { 
+  createOrder, 
+  getOrderById, 
+  listOrders, 
+  updateOrderStatus, 
+  deleteOrder 
+};
