@@ -22,7 +22,7 @@ export default function RegisterPage() {
     setIsSuccess(false);
     
     try {
-      const res = await fetch("/api/v1/auth/register", {
+      const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
@@ -142,3 +142,4 @@ export default function RegisterPage() {
     </main>
   );
 }
+
