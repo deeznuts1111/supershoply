@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { calcTotals } from "@/lib/checkout";
 import { Suspense } from "react";
 import { ShoppingCart, Package, CreditCard, MapPin, Phone, User, FileText, ArrowLeft, CheckCircle, Terminal, Zap } from "lucide-react";
+import SiteFooter from "@/components/SiteFooter";
 
 const API_URL = "https://supershoply-api.onrender.com/api/v1";
 
@@ -92,11 +93,11 @@ function CheckoutContent() {
     setError(null);
 
     if (!products.length) {
-      setError("Giỏ hàng trống hoặc tham số URL không hợp lệ.");
+      setError("Cart is empty or invalid URL parameters.");
       return;
     }
     if (!name.trim() || !addr.trim()) {
-      setError("Vui lòng nhập Họ tên và Địa chỉ.");
+      setError("Please enter your Name and Address.");
       return;
     }
 
@@ -125,12 +126,12 @@ function CheckoutContent() {
       const data = await response.json();
       
       if (!response.ok || !data.ok) {
-        throw new Error(data.error?.message || "Tạo đơn hàng thất bại");
+        throw new Error(data.error?.message || "Failed to create order");
       }
 
       setResult(data.order);
     } catch (err: any) {
-      setError(err.message || "Có lỗi xảy ra khi đặt hàng.");
+      setError(err.message || "An error occurred while placing order.");
     } finally {
       setSubmitting(false);
     }
@@ -142,7 +143,7 @@ function CheckoutContent() {
         <div className="text-center">
           <div className="inline-flex items-center gap-3 px-6 py-3 rounded-none bg-[#0a0e27] border-2 border-cyan-400 shadow-[0_0_20px_rgba(0,247,255,0.4)]">
             <Terminal size={20} className="text-cyan-400 animate-pulse" />
-            <p className="text-cyan-400 font-black tracking-wider">LOADING CART DATA...</p>
+            <p className="text-cyan-400 font-black tracking-wider">LOADING DATA...</p>
           </div>
         </div>
       </div>
@@ -185,13 +186,15 @@ function CheckoutContent() {
 
                 {products.length === 0 ? (
                   <div className="text-center py-12">
-                    <p className="text-gray-400 mb-4">Không có sản phẩm trong giỏ hàng</p>
+                    <p className="text-gray-400 mb-4" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+                      No items in cart
+                    </p>
                     <button
                       onClick={() => router.push("/shop")}
                       className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-black font-black hover:shadow-[0_0_20px_rgba(0,247,255,0.6)] transition-all"
                     >
                       <ShoppingCart size={18} />
-                      VÀO SHOP
+                      GO TO SHOP
                     </button>
                   </div>
                 ) : (
@@ -212,8 +215,8 @@ function CheckoutContent() {
                         </div>
                       </div>
                     ))}
-                    <div className="text-right text-sm text-gray-400 pt-2 border-t border-cyan-400/20">
-                      {products.length} sản phẩm
+                    <div className="text-right text-sm text-gray-400 pt-2 border-t border-cyan-400/20" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+                      {products.length} item{products.length !== 1 ? 's' : ''}
                     </div>
                   </div>
                 )}
@@ -234,43 +237,46 @@ function CheckoutContent() {
 
                   <div>
                     <label className="flex items-center gap-2 text-sm text-cyan-400 font-bold mb-2">
-                      <User size={16} /> HỌ TÊN *
+                      <User size={16} /> FULL NAME *
                     </label>
                     <input
                       className="w-full bg-[#0a0e27] border border-cyan-400/40 text-white px-4 py-3 focus:border-cyan-400 focus:outline-none focus:shadow-[0_0_10px_rgba(0,247,255,0.3)] transition-all"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="Nhập họ tên..."
+                      placeholder="Enter your name..."
+                      style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
                     />
                   </div>
 
                   <div>
                     <label className="flex items-center gap-2 text-sm text-cyan-400 font-bold mb-2">
-                      <Phone size={16} /> SỐ ĐIỆN THOẠI
+                      <Phone size={16} /> PHONE NUMBER
                     </label>
                     <input
                       className="w-full bg-[#0a0e27] border border-cyan-400/40 text-white px-4 py-3 focus:border-cyan-400 focus:outline-none focus:shadow-[0_0_10px_rgba(0,247,255,0.3)] transition-all"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="090..."
+                      style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
                     />
                   </div>
 
                   <div>
                     <label className="flex items-center gap-2 text-sm text-cyan-400 font-bold mb-2">
-                      <MapPin size={16} /> ĐỊA CHỈ *
+                      <MapPin size={16} /> ADDRESS *
                     </label>
                     <textarea
                       className="w-full bg-[#0a0e27] border border-cyan-400/40 text-white px-4 py-3 focus:border-cyan-400 focus:outline-none focus:shadow-[0_0_10px_rgba(0,247,255,0.3)] transition-all min-h-[100px]"
                       value={addr}
                       onChange={(e) => setAddr(e.target.value)}
-                      placeholder="Số nhà, đường, quận/huyện, tỉnh/thành..."
+                      placeholder="Street, district, city..."
+                      style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
                     />
                   </div>
 
                   <div>
                     <label className="flex items-center gap-2 text-sm text-cyan-400 font-bold mb-3">
-                      <CreditCard size={16} /> PHƯƠNG THỨC THANH TOÁN
+                      <CreditCard size={16} /> PAYMENT METHOD
                     </label>
                     <div className="grid grid-cols-3 gap-3">
                       {[
@@ -297,13 +303,14 @@ function CheckoutContent() {
 
                   <div>
                     <label className="flex items-center gap-2 text-sm text-cyan-400 font-bold mb-2">
-                      <FileText size={16} /> GHI CHÚ
+                      <FileText size={16} /> NOTE
                     </label>
                     <textarea
                       className="w-full bg-[#0a0e27] border border-cyan-400/40 text-white px-4 py-3 focus:border-cyan-400 focus:outline-none focus:shadow-[0_0_10px_rgba(0,247,255,0.3)] transition-all min-h-[80px]"
                       value={note}
                       onChange={(e) => setNote(e.target.value)}
-                      placeholder="Ghi chú đơn hàng (tùy chọn)..."
+                      placeholder="Order note (optional)..."
+                      style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
                     />
                   </div>
 
@@ -321,8 +328,9 @@ function CheckoutContent() {
                       type="submit"
                       disabled={submitting || products.length === 0}
                       className="flex-1 px-6 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-black font-black text-lg hover:shadow-[0_0_30px_rgba(0,247,255,0.6)] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                      style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
                     >
-                      {submitting ? "PROCESSING..." : "ĐẶT HÀNG NGAY"}
+                      {submitting ? "PROCESSING..." : "PLACE ORDER"}
                     </button>
                     <button
                       type="button"
@@ -365,14 +373,16 @@ function CheckoutContent() {
                     <button
                       onClick={() => router.push("/shop")}
                       className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-black font-black hover:shadow-[0_0_20px_rgba(0,247,255,0.6)] transition-all"
+                      style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
                     >
-                      TIẾP TỤC MUA SẮM
+                      CONTINUE SHOPPING
                     </button>
                     <button
                       onClick={() => router.push("/")}
                       className="px-6 py-3 border-2 border-cyan-400 text-cyan-400 font-black hover:bg-cyan-500/20 transition-all"
+                      style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
                     >
-                      VỀ TRANG CHỦ
+                      BACK TO HOME
                     </button>
                   </div>
                 </div>
@@ -411,8 +421,8 @@ function CheckoutContent() {
                 </div>
 
                 <div className="mt-6 p-4 border border-cyan-400/20 bg-[#0a0e27]/50">
-                  <p className="text-xs text-gray-400 leading-relaxed">
-                    * Phí ship thay đổi theo địa chỉ & khuyến mãi. Đây là giá tạm tính cho mục đích demo.
+                  <p className="text-xs text-gray-400 leading-relaxed" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+                    * Shipping fee varies by location & promotions. This is an estimated price for demo purposes.
                   </p>
                 </div>
               </div>
@@ -420,6 +430,8 @@ function CheckoutContent() {
           </aside>
         </div>
       </div>
+
+      <SiteFooter />
     </div>
   );
 }
@@ -430,7 +442,7 @@ export default function CheckoutPage() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0a0e27] to-[#0f172a]">
         <div className="inline-flex items-center gap-3 px-6 py-3 rounded-none bg-[#0a0e27] border-2 border-cyan-400 shadow-[0_0_20px_rgba(0,247,255,0.4)]">
           <Terminal size={20} className="text-cyan-400 animate-pulse" />
-          <p className="text-cyan-400 font-black tracking-wider">INITIALIZING...</p>
+          <p className="text-cyan-400 font-black tracking-wider">INITIALIZING SYSTEM...</p>
         </div>
       </div>
     }>
