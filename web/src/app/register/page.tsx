@@ -3,9 +3,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, type RegisterValues } from "@/app/features/auth/schemas";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [serverMsg, setServerMsg] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+  
   const {
     register,
     handleSubmit,
@@ -15,23 +19,44 @@ export default function RegisterPage() {
 
   async function onSubmit(values: RegisterValues) {
     setServerMsg(null);
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
-    });
-    if (!res.ok) {
+    setIsSuccess(false);
+    
+    try {
+      const res = await fetch("/api/v1/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      
       const data = await res.json();
-      setServerMsg(data?.message ?? "Đăng ký thất bại");
-      return;
+      
+      if (!res.ok) {
+        setServerMsg(data?.message ?? "Đăng ký thất bại");
+        return;
+      }
+      
+      // Lưu token vào localStorage
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+      
+      setIsSuccess(true);
+      setServerMsg("Đăng ký thành công! Đang chuyển hướng...");
+      
+      // Redirect sau 1.5s
+      setTimeout(() => {
+        router.push("/shop");
+      }, 1500);
+      
+    } catch (error) {
+      setServerMsg("Có lỗi xảy ra khi đăng ký");
     }
-    setServerMsg("Đăng ký thành công (mock)");
   }
 
   const pwd = watch("password");
 
   return (
-    <main className="py-10 max-w-md mx-auto">
+    <main className="py-10 max-w-md mx-auto px-4">
       <h1 className="text-2xl font-semibold">Đăng ký</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
         <div>
@@ -103,12 +128,16 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={isSubmitting || !isValid}
-          className="h-10 px-4 rounded-md border bg-black text-white disabled:opacity-50"
+          className="h-10 px-4 rounded-md border bg-black text-white disabled:opacity-50 w-full"
         >
           {isSubmitting ? "Đang đăng ký..." : "Đăng ký"}
         </button>
 
-        {serverMsg && <p className="text-sm mt-2">{serverMsg}</p>}
+        {serverMsg && (
+          <p className={`text-sm mt-2 ${isSuccess ? "text-green-600" : "text-red-600"}`}>
+            {serverMsg}
+          </p>
+        )}
       </form>
     </main>
   );
