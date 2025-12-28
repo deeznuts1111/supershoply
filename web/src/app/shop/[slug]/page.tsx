@@ -7,6 +7,7 @@ import type { Product } from "@/types/product";
 import SiteFooter from "@/components/SiteFooter";
 import { getProductBySlug } from "@/lib/catalog";
 import AddToCartButton from "@/features/cart/AddToCartButton";
+import BuyNowButton from "@/features/cart/BuyNowButton";
 
 const API_URL = "https://supershoply-api.onrender.com/api/v1";
 
@@ -147,12 +148,10 @@ export default async function ProductDetailPage({
               fullWidth={false}
             />
 
-            <button
-              disabled={outOfStock}
-              className="h-10 px-5 border border-cyan-400/40 bg-cyan-500 text-black font-bold hover:shadow-[0_0_20px_rgba(0,247,255,0.5)] disabled:opacity-40"
-            >
-              Mua ngay
-            </button>
+            <BuyNowButton
+             product={product}
+             disabled={outOfStock}
+           />
 
             <Link
               href="/shop"
@@ -261,3 +260,4 @@ export default async function ProductDetailPage({
     </main>
   );
 }
+
