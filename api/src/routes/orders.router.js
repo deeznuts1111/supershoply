@@ -14,27 +14,27 @@ const validate = (schema) => (req, _res, next) => {
   } 
 };
 
-// Public: Create order (checkout)
-router.post("/", validate(createOrderSchema), (req, res, next) => 
-  Promise.resolve(createOrder(req, res, next)).catch(next)
-);
-
-// Public: Get single order by ID
-router.get("/:id", (req, res, next) => 
-  Promise.resolve(getOrderById(req, res, next)).catch(next)
-);
-
-// Admin only: List all orders (with filters)
+// ✅ Admin only: List all orders (đặt TRƯỚC /:id)
 router.get("/", requireAuth, requireRole("admin"), (req, res, next) => 
   Promise.resolve(listOrders(req, res, next)).catch(next)
 );
 
-// Admin only: Update order status
+// ✅ Public: Create order (checkout)
+router.post("/", validate(createOrderSchema), (req, res, next) => 
+  Promise.resolve(createOrder(req, res, next)).catch(next)
+);
+
+// ✅ Public: Get single order by ID (đặt SAU route /)
+router.get("/:id", (req, res, next) => 
+  Promise.resolve(getOrderById(req, res, next)).catch(next)
+);
+
+// ✅ Admin only: Update order status
 router.patch("/:id", requireAuth, requireRole("admin"), (req, res, next) => 
   Promise.resolve(updateOrderStatus(req, res, next)).catch(next)
 );
 
-// Admin only: Delete order
+// ✅ Admin only: Delete order
 router.delete("/:id", requireAuth, requireRole("admin"), (req, res, next) => 
   Promise.resolve(deleteOrder(req, res, next)).catch(next)
 );
