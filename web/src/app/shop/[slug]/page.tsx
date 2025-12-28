@@ -142,11 +142,22 @@ export default async function ProductDetailPage({
           )}
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <AddToCartButton
-              product={product}
-              disabled={outOfStock}
-              fullWidth={false}
-            />
+            <div className="
+              [&>button]:bg-transparent
+              [&>button]:border
+              [&>button]:border-cyan-400/40
+              [&>button]:text-white
+              [&>button:hover]:bg-cyan-500
+              [&>button:hover]:shadow-[0_0_20px_rgba(0,247,255,0.5)]
+              [&>button]:transition
+            ">
+              <AddToCartButton
+                product={product}
+                disabled={outOfStock}
+                fullWidth={false}
+              />
+            </div>
+
 
             <BuyNowButton
              product={product}
@@ -169,8 +180,7 @@ export default async function ProductDetailPage({
       {relatedProducts.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 mt-20">
           <h3 className="text-2xl font-black text-white mb-8">
-            CÓ THỂ BẠN{" "}
-            <span className="text-cyan-400">QUAN TÂM</span>
+            <span className="text-cyan-400">RELATED PRODUCTS</span>
           </h3>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -260,4 +270,5 @@ export default async function ProductDetailPage({
     </main>
   );
 }
+
 
