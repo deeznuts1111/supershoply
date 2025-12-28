@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { registerSchema } from "@/app/features/auth/schemas";
 
-const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://supershoply-api.onrender.com";
-
+const API_URL = "https://supershoply-api.onrender.com"; // Hardcode tạm
 export async function POST(req: Request) {
   console.log("🔍 API_URL being used:", API_URL);
   console.log("🔍 Full URL will be:", `${API_URL}/api/v1/auth/register`);
@@ -55,5 +54,6 @@ export async function POST(req: Request) {
     );
   }
 }
+
 
 
