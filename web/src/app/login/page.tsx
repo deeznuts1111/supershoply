@@ -3,9 +3,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginValues } from "@/app/features/auth/schemas";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [serverMsg, setServerMsg] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+  
   const {
     register,
     handleSubmit,
@@ -14,22 +19,47 @@ export default function LoginPage() {
 
   async function onSubmit(values: LoginValues) {
     setServerMsg(null);
-    // Mock call: gửi tới Route Handler /api/auth/login
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
-    });
-    if (!res.ok) {
+    setIsSuccess(false);
+    
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      
       const data = await res.json();
-      setServerMsg(data?.message ?? "Đăng nhập thất bại");
-      return;
+      
+      if (!res.ok) {
+        setServerMsg(data?.message ?? "Đăng nhập thất bại");
+        return;
+      }
+      
+      // Lưu token vào localStorage
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+      
+      // Lưu thông tin user nếu cần
+      if (data.user) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+      }
+      
+      setIsSuccess(true);
+      setServerMsg("Đăng nhập thành công! Đang chuyển hướng...");
+      
+      // Redirect sau 1s
+      setTimeout(() => {
+        router.push("/shop");
+      }, 1000);
+      
+    } catch (error) {
+      setServerMsg("Có lỗi xảy ra khi đăng nhập");
     }
-    setServerMsg("Đăng nhập thành công (mock)");
   }
 
   return (
-    <main className="py-10 max-w-md mx-auto">
+    <main className="py-10 max-w-md mx-auto px-4">
       <h1 className="text-2xl font-semibold">Đăng nhập</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
         <div>
@@ -67,12 +97,23 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={isSubmitting || !isValid}
-          className="h-10 px-4 rounded-md border bg-black text-white disabled:opacity-50"
+          className="h-10 px-4 rounded-md border bg-black text-white disabled:opacity-50 w-full"
         >
           {isSubmitting ? "Đang đăng nhập..." : "Đăng nhập"}
         </button>
 
-        {serverMsg && <p className="text-sm mt-2">{serverMsg}</p>}
+        {serverMsg && (
+          <p className={`text-sm mt-2 ${isSuccess ? "text-green-600" : "text-red-600"}`}>
+            {serverMsg}
+          </p>
+        )}
+
+        <div className="text-center text-sm text-gray-600 mt-4">
+          Chưa có tài khoản?{" "}
+          <Link href="/register" className="text-blue-600 hover:underline">
+            Đăng ký ngay
+          </Link>
+        </div>
       </form>
     </main>
   );
