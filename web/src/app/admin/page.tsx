@@ -1,7 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { listOrders, updateOrderStatus, deleteOrder, listProducts, createProduct, updateProduct, deleteProduct } from "@/services/admin";
+import {
+  listOrders,
+  updateOrderStatus,
+  deleteOrder,
+  listProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+} from "@/services/admin";
 import type { Order } from "@/types/order";
 import type { Product } from "@/types/product";
 
@@ -16,18 +24,18 @@ export default function AdminPage() {
   useEffect(() => {
     const storedToken = localStorage.getItem("adminToken");
     const storedUser = localStorage.getItem("adminUser");
-    
+
     if (!storedToken || !storedUser) {
       router.push("/admin/login");
       return;
     }
-    
+
     const parsedUser = JSON.parse(storedUser);
     if (parsedUser.role !== "admin") {
       router.push("/admin/login");
       return;
     }
-    
+
     setToken(storedToken);
     setUser(parsedUser);
   }, [router]);
@@ -40,52 +48,55 @@ export default function AdminPage() {
 
   if (!token || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Đang tải...</p>
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0e27] text-cyan-300">
+        Đang tải hệ thống...
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+    <main className="min-h-screen bg-[#0a0e27] text-gray-200">
+      {/* HEADER */}
+      <header className="border-b border-cyan-400/20 bg-[#0f172a] shadow-[0_0_30px_rgba(0,247,255,0.1)]">
+        <div className="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-            <p className="text-sm text-gray-600">Xin chào, {user.name}</p>
+            <h1 className="text-2xl font-black tracking-wide text-white">
+              ADMIN <span className="text-cyan-400">DASHBOARD</span>
+            </h1>
+            <p className="text-sm text-cyan-300/70">
+              Xin chào, {user.name}
+            </p>
           </div>
           <button
             onClick={handleLogout}
-            className="px-4 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition"
+            className="px-4 py-2 border border-red-400/40 text-red-400 hover:bg-red-500/10 transition font-bold"
           >
             Đăng xuất
           </button>
         </div>
       </header>
 
-      {/* Tabs */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex gap-4 border-b mb-6">
-          <button
-            onClick={() => setTab("orders")}
-            className={`pb-3 px-1 font-medium border-b-2 transition ${
-              tab === "orders" ? "border-blue-600 text-blue-600" : "border-transparent text-gray-600 hover:text-gray-900"
-            }`}
-          >
-            Quản lý đơn hàng
-          </button>
-          <button
-            onClick={() => setTab("products")}
-            className={`pb-3 px-1 font-medium border-b-2 transition ${
-              tab === "products" ? "border-blue-600 text-blue-600" : "border-transparent text-gray-600 hover:text-gray-900"
-            }`}
-          >
-            Quản lý sản phẩm
-          </button>
+      {/* TABS */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="flex gap-8 border-b border-cyan-400/20 mb-8">
+          {[
+            { key: "orders", label: "QUẢN LÝ ĐƠN HÀNG" },
+            { key: "products", label: "QUẢN LÝ SẢN PHẨM" },
+          ].map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key as Tab)}
+              className={`pb-4 font-bold tracking-wider transition border-b-2 ${
+                tab === t.key
+                  ? "border-cyan-400 text-cyan-400"
+                  : "border-transparent text-gray-500 hover:text-cyan-300"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
         </div>
 
-        {/* Content */}
         {tab === "orders" && <OrdersManager token={token} />}
         {tab === "products" && <ProductsManager token={token} />}
       </div>
@@ -93,7 +104,8 @@ export default function AdminPage() {
   );
 }
 
-// ============ ORDERS MANAGER ============
+/* ================= ORDERS ================= */
+
 function OrdersManager({ token }: { token: string }) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -104,11 +116,13 @@ function OrdersManager({ token }: { token: string }) {
   const loadOrders = async () => {
     setLoading(true);
     try {
-      const result = await listOrders(token, { page, limit: 10, status: filterStatus || undefined });
+      const result = await listOrders(token, {
+        page,
+        limit: 10,
+        status: filterStatus || undefined,
+      });
       setOrders(result.data);
       setTotal(result.total);
-    } catch (error) {
-      alert("Lỗi tải đơn hàng: " + (error instanceof Error ? error.message : "Unknown"));
     } finally {
       setLoading(false);
     }
@@ -118,84 +132,87 @@ function OrdersManager({ token }: { token: string }) {
     loadOrders();
   }, [page, filterStatus]);
 
-  const handleStatusChange = async (orderId: string, newStatus: "pending" | "paid" | "canceled") => {
-    try {
-      await updateOrderStatus(token, orderId, newStatus);
-      loadOrders();
-    } catch (error) {
-      alert("Lỗi cập nhật: " + (error instanceof Error ? error.message : "Unknown"));
-    }
-  };
-
-  const handleDelete = async (orderId: string) => {
-    if (!confirm("Xác nhận xóa đơn hàng này?")) return;
-    try {
-      await deleteOrder(token, orderId);
-      loadOrders();
-    } catch (error) {
-      alert("Lỗi xóa: " + (error instanceof Error ? error.message : "Unknown"));
-    }
-  };
-
-  if (loading) return <p>Đang tải đơn hàng...</p>;
+  if (loading) {
+    return <p className="text-cyan-300">Đang tải đơn hàng...</p>;
+  }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">Danh sách đơn hàng ({total})</h2>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-bold text-white">
+          Đơn hàng <span className="text-cyan-400">({total})</span>
+        </h2>
         <select
           value={filterStatus}
-          onChange={(e) => { setFilterStatus(e.target.value); setPage(1); }}
-          className="border rounded-md px-3 py-2"
+          onChange={(e) => {
+            setFilterStatus(e.target.value);
+            setPage(1);
+          }}
+          className="bg-[#0a0e27] border border-cyan-400/30 text-cyan-300 px-3 py-2"
         >
-          <option value="">Tất cả trạng thái</option>
+          <option value="">Tất cả</option>
           <option value="pending">Pending</option>
           <option value="paid">Paid</option>
           <option value="canceled">Canceled</option>
         </select>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b">
+      <div className="overflow-hidden border border-cyan-400/20 bg-[#0f172a] shadow-[0_0_25px_rgba(0,247,255,0.08)]">
+        <table className="w-full text-sm">
+          <thead className="bg-cyan-500/10 text-cyan-300">
             <tr>
-              <th className="px-4 py-3 text-left text-sm font-medium">ID</th>
-              <th className="px-4 py-3 text-left text-sm font-medium">Khách hàng</th>
-              <th className="px-4 py-3 text-left text-sm font-medium">Tổng tiền</th>
-              <th className="px-4 py-3 text-left text-sm font-medium">Trạng thái</th>
-              <th className="px-4 py-3 text-left text-sm font-medium">Ngày tạo</th>
-              <th className="px-4 py-3 text-left text-sm font-medium">Hành động</th>
+              <th className="px-4 py-3 text-left">ID</th>
+              <th className="px-4 py-3 text-left">Khách</th>
+              <th className="px-4 py-3">Tổng</th>
+              <th className="px-4 py-3">Trạng thái</th>
+              <th className="px-4 py-3">Ngày</th>
+              <th className="px-4 py-3">Xóa</th>
             </tr>
           </thead>
-          <tbody className="divide-y">
-            {orders.map((order) => (
-              <tr key={order._id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 text-sm font-mono">{order._id.slice(-6)}</td>
-                <td className="px-4 py-3 text-sm">
-                  <div>{order.customerName}</div>
-                  <div className="text-gray-500 text-xs">{order.customerPhone}</div>
+          <tbody className="divide-y divide-cyan-400/10">
+            {orders.map((o) => (
+              <tr key={o._id} className="hover:bg-cyan-500/5">
+                <td className="px-4 py-3 font-mono text-cyan-400">
+                  {o._id.slice(-6)}
                 </td>
-                <td className="px-4 py-3 text-sm font-medium">{order.total.toLocaleString()}đ</td>
-                <td className="px-4 py-3 text-sm">
+                <td className="px-4 py-3">
+                  <div>{o.customerName}</div>
+                  <div className="text-xs text-gray-500">
+                    {o.customerPhone}
+                  </div>
+                </td>
+                <td className="px-4 py-3 text-center">
+                  {o.total.toLocaleString()}đ
+                </td>
+                <td className="px-4 py-3 text-center">
                   <select
-                    value={order.status}
-                    onChange={(e) => handleStatusChange(order._id, e.target.value as any)}
-                    className="border rounded px-2 py-1 text-xs"
+                    value={o.status}
+                    onChange={(e) =>
+                      updateOrderStatus(
+                        token,
+                        o._id,
+                        e.target.value as any
+                      ).then(loadOrders)
+                    }
+                    className="bg-[#0a0e27] border border-cyan-400/30 text-cyan-300 px-2 py-1"
                   >
                     <option value="pending">Pending</option>
                     <option value="paid">Paid</option>
                     <option value="canceled">Canceled</option>
                   </select>
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-600">
-                  {order.createdAt ? new Date(order.createdAt).toLocaleDateString("vi-VN") : "-"}
+                <td className="px-4 py-3 text-center text-gray-400">
+                  {new Date(o.createdAt!).toLocaleDateString("vi-VN")}
                 </td>
-                <td className="px-4 py-3 text-sm">
+                <td className="px-4 py-3 text-center">
                   <button
-                    onClick={() => handleDelete(order._id)}
-                    className="text-red-600 hover:text-red-800 text-sm"
+                    onClick={() =>
+                      confirm("Xóa đơn hàng?") &&
+                      deleteOrder(token, o._id).then(loadOrders)
+                    }
+                    className="text-red-400 hover:text-red-300 font-bold"
                   >
-                    Xóa
+                    X
                   </button>
                 </td>
               </tr>
@@ -203,30 +220,12 @@ function OrdersManager({ token }: { token: string }) {
           </tbody>
         </table>
       </div>
-
-      {/* Pagination */}
-      <div className="flex items-center justify-between mt-4">
-        <button
-          onClick={() => setPage(p => Math.max(1, p - 1))}
-          disabled={page === 1}
-          className="px-4 py-2 border rounded-md disabled:opacity-50"
-        >
-          Trang trước
-        </button>
-        <span className="text-sm">Trang {page}</span>
-        <button
-          onClick={() => setPage(p => p + 1)}
-          disabled={orders.length < 10}
-          className="px-4 py-2 border rounded-md disabled:opacity-50"
-        >
-          Trang sau
-        </button>
-      </div>
     </div>
   );
 }
 
-// ============ PRODUCTS MANAGER ============
+/* ================= PRODUCTS ================= */
+
 function ProductsManager({ token }: { token: string }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -238,98 +237,98 @@ function ProductsManager({ token }: { token: string }) {
 
   const loadProducts = async () => {
     setLoading(true);
-    try {
-      const result = await listProducts({ page, limit: 10, q: searchQuery || undefined });
-      setProducts(result.data);
-      setTotal(result.total);
-    } catch (error) {
-      alert("Lỗi tải sản phẩm: " + (error instanceof Error ? error.message : "Unknown"));
-    } finally {
-      setLoading(false);
-    }
+    const result = await listProducts({
+      page,
+      limit: 10,
+      q: searchQuery || undefined,
+    });
+    setProducts(result.data);
+    setTotal(result.total);
+    setLoading(false);
   };
 
   useEffect(() => {
     loadProducts();
   }, [page, searchQuery]);
 
-  const handleDelete = async (productId: string) => {
-    if (!confirm("Xác nhận xóa sản phẩm này?")) return;
-    try {
-      await deleteProduct(token, productId);
-      loadProducts();
-    } catch (error) {
-      alert("Lỗi xóa: " + (error instanceof Error ? error.message : "Unknown"));
-    }
-  };
-
-  if (loading) return <p>Đang tải sản phẩm...</p>;
+  if (loading) {
+    return <p className="text-cyan-300">Đang tải sản phẩm...</p>;
+  }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">Danh sách sản phẩm ({total})</h2>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-bold text-white">
+          Sản phẩm <span className="text-cyan-400">({total})</span>
+        </h2>
         <div className="flex gap-2">
           <input
-            type="text"
-            placeholder="Tìm kiếm..."
             value={searchQuery}
-            onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
-            className="border rounded-md px-3 py-2"
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setPage(1);
+            }}
+            placeholder="Search..."
+            className="bg-[#0a0e27] border border-cyan-400/30 text-cyan-300 px-3 py-2"
           />
           <button
-            onClick={() => { setEditingProduct(null); setShowForm(true); }}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            onClick={() => {
+              setEditingProduct(null);
+              setShowForm(true);
+            }}
+            className="px-4 py-2 bg-cyan-500 text-black font-bold hover:shadow-[0_0_20px_rgba(0,247,255,0.6)]"
           >
-            Thêm sản phẩm
+            + Thêm
           </button>
         </div>
       </div>
 
-      {showForm && (
-        <ProductForm
-          token={token}
-          product={editingProduct}
-          onClose={() => { setShowForm(false); setEditingProduct(null); }}
-          onSuccess={() => { setShowForm(false); setEditingProduct(null); loadProducts(); }}
-        />
-      )}
-
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b">
+      <div className="border border-cyan-400/20 bg-[#0f172a] shadow-[0_0_25px_rgba(0,247,255,0.08)]">
+        <table className="w-full text-sm">
+          <thead className="bg-cyan-500/10 text-cyan-300">
             <tr>
-              <th className="px-4 py-3 text-left text-sm font-medium">Hình ảnh</th>
-              <th className="px-4 py-3 text-left text-sm font-medium">Tên</th>
-              <th className="px-4 py-3 text-left text-sm font-medium">Giá</th>
-              <th className="px-4 py-3 text-left text-sm font-medium">Tồn kho</th>
-              <th className="px-4 py-3 text-left text-sm font-medium">Hành động</th>
+              <th className="px-4 py-3">Ảnh</th>
+              <th className="px-4 py-3 text-left">Tên</th>
+              <th className="px-4 py-3">Giá</th>
+              <th className="px-4 py-3">Kho</th>
+              <th className="px-4 py-3">Hành động</th>
             </tr>
           </thead>
-          <tbody className="divide-y">
-            {products.map((product) => (
-              <tr key={product._id} className="hover:bg-gray-50">
+          <tbody className="divide-y divide-cyan-400/10">
+            {products.map((p) => (
+              <tr key={p._id} className="hover:bg-cyan-500/5">
                 <td className="px-4 py-3">
-                  {product.images?.[0] && (
-                    <img src={product.images[0]} alt={product.title} className="w-12 h-12 object-cover rounded" />
+                  {p.images?.[0] && (
+                    <img
+                      src={p.images[0]}
+                      className="w-12 h-12 object-cover border border-cyan-400/30"
+                    />
                   )}
                 </td>
-                <td className="px-4 py-3 text-sm">
-                  <div className="font-medium">{product.title}</div>
-                  <div className="text-gray-500 text-xs">{product.slug}</div>
+                <td className="px-4 py-3">
+                  <div className="font-bold">{p.title}</div>
+                  <div className="text-xs text-gray-500">{p.slug}</div>
                 </td>
-                <td className="px-4 py-3 text-sm font-medium">{product.price.toLocaleString()}đ</td>
-                <td className="px-4 py-3 text-sm">{product.stock}</td>
-                <td className="px-4 py-3 text-sm">
+                <td className="px-4 py-3 text-center">
+                  {p.price.toLocaleString()}đ
+                </td>
+                <td className="px-4 py-3 text-center">{p.stock}</td>
+                <td className="px-4 py-3 text-center space-x-3">
                   <button
-                    onClick={() => { setEditingProduct(product); setShowForm(true); }}
-                    className="text-blue-600 hover:text-blue-800 mr-3"
+                    onClick={() => {
+                      setEditingProduct(p);
+                      setShowForm(true);
+                    }}
+                    className="text-cyan-400 font-bold"
                   >
                     Sửa
                   </button>
                   <button
-                    onClick={() => handleDelete(product._id)}
-                    className="text-red-600 hover:text-red-800"
+                    onClick={() =>
+                      confirm("Xóa sản phẩm?") &&
+                      deleteProduct(token, p._id).then(loadProducts)
+                    }
+                    className="text-red-400 font-bold"
                   >
                     Xóa
                   </button>
@@ -340,28 +339,23 @@ function ProductsManager({ token }: { token: string }) {
         </table>
       </div>
 
-      <div className="flex items-center justify-between mt-4">
-        <button
-          onClick={() => setPage(p => Math.max(1, p - 1))}
-          disabled={page === 1}
-          className="px-4 py-2 border rounded-md disabled:opacity-50"
-        >
-          Trang trước
-        </button>
-        <span className="text-sm">Trang {page}</span>
-        <button
-          onClick={() => setPage(p => p + 1)}
-          disabled={products.length < 10}
-          className="px-4 py-2 border rounded-md disabled:opacity-50"
-        >
-          Trang sau
-        </button>
-      </div>
+      {showForm && (
+        <ProductForm
+          token={token}
+          product={editingProduct}
+          onClose={() => setShowForm(false)}
+          onSuccess={() => {
+            setShowForm(false);
+            loadProducts();
+          }}
+        />
+      )}
     </div>
   );
 }
 
-// ============ PRODUCT FORM ============
+/* ================= PRODUCT FORM ================= */
+
 function ProductForm({
   token,
   product,
@@ -382,128 +376,57 @@ function ProductForm({
     description: product?.description || "",
     images: product?.images?.join(", ") || "",
   });
-  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
-
     const payload = {
-      title: formData.title,
+      ...formData,
       price: Number(formData.price),
       stock: Number(formData.stock),
-      brand: formData.brand,
-      category: formData.category,
-      description: formData.description,
-      images: formData.images.split(",").map(s => s.trim()).filter(Boolean),
+      images: formData.images
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
     };
-
-    try {
-      if (product) {
-        await updateProduct(token, product._id, payload);
-      } else {
-        await createProduct(token, payload);
-      }
-      onSuccess();
-    } catch (error) {
-      alert("Lỗi: " + (error instanceof Error ? error.message : "Unknown"));
-    } finally {
-      setSubmitting(false);
-    }
+    product
+      ? await updateProduct(token, product._id, payload)
+      : await createProduct(token, payload);
+    onSuccess();
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <h3 className="text-xl font-bold mb-4">{product ? "Sửa sản phẩm" : "Thêm sản phẩm mới"}</h3>
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+      <div className="bg-[#0f172a] border border-cyan-400/30 p-6 w-full max-w-2xl text-gray-200">
+        <h3 className="text-xl font-black text-cyan-400 mb-4">
+          {product ? "SỬA SẢN PHẨM" : "THÊM SẢN PHẨM"}
+        </h3>
+
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Tên sản phẩm *</label>
+          {Object.entries(formData).map(([key, val]) => (
             <input
-              type="text"
-              required
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full border rounded-md px-3 py-2"
+              key={key}
+              value={val as any}
+              onChange={(e) =>
+                setFormData({ ...formData, [key]: e.target.value })
+              }
+              placeholder={key}
+              className="w-full bg-[#0a0e27] border border-cyan-400/30 px-3 py-2 text-cyan-200"
             />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Giá *</label>
-              <input
-                type="number"
-                required
-                min="0"
-                value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-                className="w-full border rounded-md px-3 py-2"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Tồn kho *</label>
-              <input
-                type="number"
-                required
-                min="0"
-                value={formData.stock}
-                onChange={(e) => setFormData({ ...formData, stock: Number(e.target.value) })}
-                className="w-full border rounded-md px-3 py-2"
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Thương hiệu</label>
-              <input
-                type="text"
-                value={formData.brand}
-                onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                className="w-full border rounded-md px-3 py-2"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Danh mục</label>
-              <input
-                type="text"
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full border rounded-md px-3 py-2"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Mô tả</label>
-            <textarea
-              rows={3}
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full border rounded-md px-3 py-2"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Hình ảnh (URL, phân cách bởi dấu phẩy)</label>
-            <textarea
-              rows={2}
-              value={formData.images}
-              onChange={(e) => setFormData({ ...formData, images: e.target.value })}
-              className="w-full border rounded-md px-3 py-2"
-              placeholder="https://example.com/img1.jpg, https://example.com/img2.jpg"
-            />
-          </div>
-          <div className="flex gap-2 justify-end">
+          ))}
+
+          <div className="flex justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border rounded-md hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-500"
             >
               Hủy
             </button>
             <button
               type="submit"
-              disabled={submitting}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+              className="px-4 py-2 bg-cyan-500 text-black font-bold"
             >
-              {submitting ? "Đang lưu..." : "Lưu"}
+              Lưu
             </button>
           </div>
         </form>
