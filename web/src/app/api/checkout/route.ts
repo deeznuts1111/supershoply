@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     // Forward request sang backend API
-    const response = await fetch(`${API_URL}/checkout`, {
+    const response = await fetch(`${API_URL}/orders`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -33,3 +33,4 @@ export async function POST(req: Request) {
     );
   }
 }
+
