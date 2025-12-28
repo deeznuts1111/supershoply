@@ -97,9 +97,10 @@ export default function CartPage() {
           </aside>
         </div>
       )}
-      <div className="mt-20">
-        <SiteFooter />
-      </div>
+      
+      <SiteFooter />
+      
     </main>
   );
+
 }
