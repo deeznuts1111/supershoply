@@ -33,7 +33,7 @@ export default function CartPage() {
       <main className="min-h-screen bg-[#0a0e27] text-gray-200 py-12">
         <div className="max-w-6xl mx-auto px-4">
           <h1 className="text-3xl font-black text-white mb-6">
-            GIỎ <span className="text-cyan-400">HÀNG</span>
+            <span className="text-cyan-400">CART</span>
           </h1>
 
           {items.length === 0 ? (
@@ -180,3 +180,4 @@ export default function CartPage() {
     </>
   );
 }
+
