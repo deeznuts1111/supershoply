@@ -10,10 +10,6 @@ import AddToCartButton from "@/features/cart/AddToCartButton";
 import BuyNowButton from "@/features/cart/BuyNowButton";
 
 const API_URL = "https://supershoply-api.onrender.com/api/v1";
-
-/* =========================================================
-   SEO METADATA
-========================================================= */
 export async function generateMetadata({
   params,
 }: {
@@ -141,6 +137,12 @@ export default async function ProductDetailPage({
             </p>
           )}
 
+          {product.description && (
+            <p className="mt-4 text-gray-300 text-sm leading-relaxed">
+              {product.description}
+            </p>
+          )}
+
           <div className="mt-8 flex flex-wrap gap-3">
             <div className="
               [&>button]:bg-transparent
@@ -262,13 +264,8 @@ export default async function ProductDetailPage({
           </div>
         </section>
       )}
-
-      {/* =====================================================
-          FOOTER
-      ===================================================== */}
+       
       <SiteFooter />
     </main>
   );
 }
-
-
