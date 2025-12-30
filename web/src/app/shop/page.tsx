@@ -47,6 +47,11 @@ export default function ShopPage() {
     router.push(`${pathname}?${sp.toString()}`, { scroll: true });
   }
 
+  function handleCategoryClick(category: string) {
+    setQInput(category);
+    setUrl({ q: category });
+  }
+
   return (
     <main className="relative min-h-screen">
       {/* ================= BACKGROUND ================= */}
@@ -112,29 +117,58 @@ export default function ShopPage() {
 
         {/* ================= SEARCH ================= */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-12">
-          <form
-            className="relative group max-w-2xl"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setUrl({ q: qInput });
-            }}
-          >
-            <div className="relative flex items-center bg-white/5 backdrop-blur-xl border-2 border-cyan-500/40 group-hover:border-cyan-400/80 transition-all duration-300">
-              <Search className="absolute left-4 w-5 h-5 text-cyan-300" />
-              <input
-                value={qInput}
-                onChange={(e) => setQInput(e.target.value)}
-                placeholder="SEARCH PRODUCTS // NHẬP TỪ KHÓA..."
-                className="w-full h-14 pl-12 pr-32 bg-transparent text-black placeholder:text-gray-500 placeholder:font-bold outline-none font-bold tracking-wide"
-              />
+          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center max-w-full">
+            <form
+              className="relative group flex-1 max-w-2xl"
+              onSubmit={(e) => {
+                e.preventDefault();
+                setUrl({ q: qInput });
+              }}
+            >
+              <div className="relative flex items-center bg-white/5 backdrop-blur-xl border-2 border-cyan-500/40 group-hover:border-cyan-400/80 transition-all duration-300">
+                <Search className="absolute left-4 w-5 h-5 text-cyan-300" />
+                <input
+                  value={qInput}
+                  onChange={(e) => setQInput(e.target.value)}
+                  placeholder="SEARCH PRODUCTS // NHẬP TỪ KHÓA..."
+                  className="w-full h-14 pl-12 pr-32 bg-transparent text-black placeholder:text-gray-500 placeholder:font-bold outline-none font-bold tracking-wide"
+                />
+                <button
+                  type="submit"
+                  className="absolute right-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-black px-6 py-2.5 font-black text-sm tracking-wider"
+                >
+                  SEARCH
+                </button>
+              </div>
+            </form>
+
+            <div className="flex gap-3 flex-wrap">
               <button
-                type="submit"
-                className="absolute right-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-black px-6 py-2.5 font-black text-sm tracking-wider"
+                onClick={() => handleCategoryClick("Laptop")}
+                className="px-6 py-3 border-2 border-cyan-500/40 text-white font-bold tracking-wider hover:bg-blue-500 hover:border-blue-500 transition-all duration-300"
               >
-                SEARCH
+                LAPTOP
+              </button>
+              <button
+                onClick={() => handleCategoryClick("PC")}
+                className="px-6 py-3 border-2 border-cyan-500/40 text-white font-bold tracking-wider hover:bg-blue-500 hover:border-blue-500 transition-all duration-300"
+              >
+                PC
+              </button>
+              <button
+                onClick={() => handleCategoryClick("RAM")}
+                className="px-6 py-3 border-2 border-cyan-500/40 text-white font-bold tracking-wider hover:bg-blue-500 hover:border-blue-500 transition-all duration-300"
+              >
+                RAM
+              </button>
+              <button
+                onClick={() => handleCategoryClick("Graphic Card")}
+                className="px-6 py-3 border-2 border-cyan-500/40 text-white font-bold tracking-wider hover:bg-blue-500 hover:border-blue-500 transition-all duration-300"
+              >
+                GRAPHIC CARD
               </button>
             </div>
-          </form>
+          </div>
         </motion.div>
 
         {/* ================= GRID ================= */}
