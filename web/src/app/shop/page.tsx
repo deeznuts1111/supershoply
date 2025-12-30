@@ -48,7 +48,6 @@ export default function ShopPage() {
   }
 
   function handleCategoryClick(category: string) {
-    setQInput(category);
     setUrl({ q: category });
   }
 
@@ -145,25 +144,25 @@ export default function ShopPage() {
             <div className="flex gap-3 flex-wrap">
               <button
                 onClick={() => handleCategoryClick("Laptop")}
-                className="px-6 py-3 border-2 border-cyan-500/40 text-white font-bold tracking-wider hover:bg-blue-500 hover:border-blue-500 transition-all duration-300"
+                className="px-6 py-3 border-2 border-cyan-500/40 text-black font-bold tracking-wider hover:bg-blue-500 hover:text-white transition-all duration-300"
               >
                 LAPTOP
               </button>
               <button
                 onClick={() => handleCategoryClick("PC")}
-                className="px-6 py-3 border-2 border-cyan-500/40 text-white font-bold tracking-wider hover:bg-blue-500 hover:border-blue-500 transition-all duration-300"
+                className="px-6 py-3 border-2 border-cyan-500/40 text-black font-bold tracking-wider hover:bg-blue-500 hover:text-white transition-all duration-300"
               >
                 PC
               </button>
               <button
                 onClick={() => handleCategoryClick("RAM")}
-                className="px-6 py-3 border-2 border-cyan-500/40 text-white font-bold tracking-wider hover:bg-blue-500 hover:border-blue-500 transition-all duration-300"
+                className="px-6 py-3 border-2 border-cyan-500/40 text-black font-bold tracking-wider hover:bg-blue-500 hover:text-white transition-all duration-300"
               >
                 RAM
               </button>
               <button
                 onClick={() => handleCategoryClick("Graphic Card")}
-                className="px-6 py-3 border-2 border-cyan-500/40 text-white font-bold tracking-wider hover:bg-blue-500 hover:border-blue-500 transition-all duration-300"
+                className="px-6 py-3 border-2 border-cyan-500/40 text-black font-bold tracking-wider hover:bg-blue-500 hover:text-white transition-all duration-300"
               >
                 GRAPHIC CARD
               </button>
