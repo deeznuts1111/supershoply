@@ -19,7 +19,7 @@ export async function generateMetadata({
   const product = await getProductBySlug(slug);
 
   return {
-    title: product ? `${product.title} – Shoply` : "Sản phẩm – Shoply",
+    title: product ? `${product.title}` : "Sản phẩm",
   };
 }
 
@@ -269,3 +269,4 @@ export default async function ProductDetailPage({
     </main>
   );
 }
+
