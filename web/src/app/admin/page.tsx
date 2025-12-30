@@ -407,7 +407,7 @@ function ProductForm({
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
       <div className="bg-[#0f172a] border border-cyan-400/30 p-6 w-full max-w-2xl text-gray-200">
         <h3 className="text-xl font-black text-cyan-400 mb-4">
-          {product ? "PRODUCT EDIT" : "ADD PRODUCT}
+          {product ? "PRODUCT EDIT" : "ADD PRODUCT"}
         </h3>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -443,4 +443,5 @@ function ProductForm({
     </div>
   );
 }
+
 
